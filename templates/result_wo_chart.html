@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Financial Health Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .result-box { border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; }
+        .score { font-size: 24px; font-weight: bold; }
+        .good { color: green; }
+        .average { color: orange; }
+        .poor { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Financial Health Assessment Results</h1>
+
+    <div class="result-box">
+        <h2>Your Financial Health Score:</h2>
+        <div class="score {% if analysis.score >= 7 %}good{% elif analysis.score >= 5 %}average{% else %}poor{% endif %}">
+            {{ analysis.score }} / 10
+        </div>
+    </div>
+
+    <div class="result-box">
+        <h2>Detailed Analysis:</h2>
+        <p>Monthly Savings: ${{ "%.2f"|format(analysis.monthly_savings) }}</p>
+        <p>Monthly Expenditure: ${{ "%.2f"|format(analysis.monthly_expenditure) }}</p>
+        <p>Loan to Income Ratio: {{ "%.1f"|format(analysis.loan_to_income_ratio) }}%</p>
+        <p>Monthly Expenditure Variance: {{ "%.1f"|format(analysis.variance_percentage) }}%</p>
+    </div>
+
+    <div class="result-box">
+        <h2>Recommendations:</h2>
+        {% if analysis.score < 7 %}
+            {% if analysis.loan_to_income_ratio > 40 %}
+                <p>• Your loan burden is high. Consider debt consolidation or accelerated repayment.</p>
+            {% endif %}
+            {% if analysis.variance_percentage > 20 %}
+                <p>• Your monthly expenditure varies significantly. Try to maintain more consistent spending habits.</p>
+            {% endif %}
+            {% if analysis.monthly_savings < analysis.monthly_expenditure * 0.2 %}
+                <p>• Your savings rate could be improved. Aim to save at least 20% of your income.</p>
+            {% endif %}
+        {% else %}
+            <p>Your financial health appears to be good! Continue maintaining your current financial habits.</p>
+        {% endif %}
+    </div>
+
+    <a href="/" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none;">
+        Start New Assessment
+    </a>
+</body>
+</html>

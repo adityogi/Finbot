@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Financial Health Assessment Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .result-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .chart-container {
+            width: 60%;
+            margin: 20px 0;
+        }
+        .metrics-container {
+            width: 35%;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+        }
+        .score-value {
+            font-size: 36px;
+        }
+        .warning {
+            color: #ff4444;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Financial Health Assessment Results</h1>
+    
+    <div class="result-container">
+        <div class="chart-container">
+            <canvas id="financialChart"></canvas>
+        </div>
+        
+        <div class="metrics-container">
+            <div class="score">
+                Financial Health Score: 
+                <span class="score-value" style="color: 
+                    {% if analysis.score >= 7 %}#2ecc71
+                    {% elif analysis.score >= 4 %}#f1c40f
+                    {% else %}#e74c3c
+                    {% endif %}">
+                    {{ analysis.score }}/10
+                </span>
+            </div>
+            
+            <h3>Key Metrics:</h3>
+            <p>Monthly Expenditure: ${{ "%.2f"|format(analysis.monthly_expenditure) }}</p>
+            <p>Monthly Savings: ${{ "%.2f"|format(analysis.monthly_savings) }}</p>
+            
+            {% if analysis.loan_to_income_ratio > 0 %}
+            <p>Loan to Income Ratio: {{ "%.1f"|format(analysis.loan_to_income_ratio) }}%</p>
+            {% endif %}
+            
+            <p>Monthly Variance: {{ "%.1f"|format(analysis.variance_percentage) }}%</p>
+            
+            {% if analysis.variance_percentage > 20 %}
+            <p class="warning">⚠️ High monthly variance in expenditure</p>
+            {% endif %}
+            
+            {% if analysis.loan_to_income_ratio > 40 %}
+            <p class="warning">⚠️ High loan burden</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('financialChart').getContext('2d');
+        
+        // Prepare data for chart
+        const labels = ['Monthly Breakdown'];
+        const expenditure = {{ analysis.monthly_expenditure }};
+        const savings = {{ analysis.monthly_savings }};
+        {% if analysis.monthly_loan_payment is defined %}
+        const loanPayment = {{ analysis.monthly_loan_payment }};
+        {% endif %}
+        
+        const data = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Expenditure',
+                    data: [expenditure],
+                    backgroundColor: '#e74c3c',
+                },
+                {
+                    label: 'Savings',
+                    data: [savings],
+                    backgroundColor: '#2ecc71',
+                },
+                {% if analysis.monthly_loan_payment is defined %}
+                {
+                    label: 'Loan Payment',
+                    data: [loanPayment],
+                    backgroundColor: '#f1c40f',
+                },
+                {% endif %}
+            ]
+        };
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Monthly Financial Breakdown'
+                    },
+                },
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true,
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount ($)'
+                        }
+                    }
+                }
+            }
+        };
+
+        new Chart(ctx, config);
+    </script>
+
+    <p><a href="/" style="text-decoration: none; color: #3498db;">← Back to Assessment</a></p>
+</body>
+</html>
