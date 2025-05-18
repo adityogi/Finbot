@@ -684,8 +684,8 @@ def financial_health():
             analysis['monthly_loan_payment'] = form_data['monthly_loan_payment']
             analysis['outstanding_loan'] = form_data['outstanding_loan']
 
-        print(analysis)
-        print(country_data)
+        # print(analysis)
+        # print(country_data)
 
         # analysis {'id': 7, 'monthly_income': 11.0, 'savings_percentage': 11.0, 'emergency_fund': 'yes', 'funds_invested': 'yes', 'investment_type': 'none', 'expected_return': 8.0, 'monthly_savings': 1.21, 'monthly_expenditure': 9.79, 'monthly_variance': 2.0, 'has_loans': 'no', 'loan_to_income_ratio': 0, 'variance_percentage': 20.42900919305414, 'score': 7.5, 'region_code': 'IN', 'currency': {'code': 'INR', 'symbol': '₹', 'exchange_rate': 83.2}, 'economic_data': {'inflation_rate': 5.6, 'average_income': 174984, 'interest_rate': 6.5, 'unemployment_rate': 7.1}}
         # country_data {'name': 'India', 'code': 'IN', 'currency': {'code': 'INR', 'symbol': '₹', 'exchange_rate': 83.2}, 'economic_data': {'inflation_rate': 5.6, 'average_income': 174984, 'interest_rate': 6.5, 'unemployment_rate': 7.1}, 'financial_targets': {'emergency_fund_months': 8, 'recommended_savings_rate': 30, 'max_loan_to_income': 40}}
