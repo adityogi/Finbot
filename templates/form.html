@@ -2,95 +2,507 @@
 <html>
 <head>
     <title>Financial Health Assessment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input, select { width: 200px; padding: 5px; }
-        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
-        .loan-fields { display: none; }
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --primary-light: #C8E6C9;
+            --accent: #FF9800;
+            --light-grey: #f5f5f5;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        button.secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .loan-fields {
+            display: none;
+            background-color: var(--light-grey);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 10px;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .progress-indicator {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background-color: #e9e9e9;
+            position: relative;
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            margin: 0 5px;
+        }
+
+        .step.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+        }
+
+        .budget-category {
+            display: inline-block;
+            width: 48%;
+            margin-right: 2%;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 5px;
+        }
+
+        .help-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Icon styling */
+        .icon {
+            margin-right: 8px;
+            color: var(--primary-dark);
+        }
     </style>
 </head>
 <body>
-    <h1>Financial Health Assessment</h1>
-    <form method="POST">
-        <div class="form-group">
-            <label>Monthly Income (in Dollars):</label>
-            <input type="number" name="monthly_income" required step="0.01">
-        </div>
+    <div class="nav-links">
+        <a href="/" class="nav-link">New Assessment</a>
+        <a href="/history" class="nav-link">History</a>
+        <a href="/goals" class="nav-link">Financial Goals</a>
+    </div>
 
-        <div class="form-group">
-            <label>Savings Percentage (in %):</label>
-            <input type="number" name="savings_percentage" required min="0" max="100" step="0.1">
-        </div>
+    <h1><i class="fas fa-chart-line icon"></i> Financial Health Assessment</h1>
 
-        <div class="form-group">
-            <label>Is your emergency fund fully provisioned?</label>
-            <select name="emergency_fund" required>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
+    <div class="progress-indicator">
+        <div class="step active" id="step-1">
+            <i class="fas fa-info-circle"></i> Basic Information
         </div>
-
-        <div class="form-group">
-            <label>Are your saved funds invested?</label>
-            <select name="funds_invested" required>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
+        <div class="step" id="step-2">
+            <i class="fas fa-money-bill-wave"></i> Budget (Optional)
         </div>
+    </div>
 
-        <div class="form-group">
-            <label>Type of Investment:</label>
-            <select name="investment_type">
-                <option value="none">None</option>
-                <option value="stocks">Stocks</option>
-                <option value="bonds">Bonds</option>
-                <option value="mutual_funds">Mutual Funds</option>
-                <option value="real_estate">Real Estate</option>
-                <option value="mixed">Mixed Portfolio</option>
-            </select>
-        </div>
+    <form method="POST" id="assessment-form">
+        <div class="form-section active" id="section-1">
+            <div class="card">
+                <div class="section-title"><i class="fas fa-dollar-sign icon"></i>Income & Savings</div>
 
-        <div class="form-group">
-            <label>Expected Annual Return (in %):</label>
-            <input type="number" name="expected_return" value="0" step="0.1">
-        </div>
+                <div class="form-group">
+                    <label>Monthly Income (in Dollars)</label>
+                    <input type="number" name="monthly_income" required step="0.01" placeholder="e.g. 5000">
+                </div>
 
-        <div class="form-group">
-            <label>Monthly Variance in Expenditure (in Dollars):</label>
-            <input type="number" name="monthly_variance" required step="0.01">
-        </div>
+                <div class="form-group">
+                    <label>Savings Percentage (%)</label>
+                    <input type="number" name="savings_percentage" required min="0" max="100" step="0.1" placeholder="e.g. 20">
+                    <div class="help-text">Aim for at least 20% of your income</div>
+                </div>
 
-        <div class="form-group">
-            <label>Do you have any loans?</label>
-            <select name="has_loans" id="has_loans" required onchange="toggleLoanFields()">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-            </select>
-        </div>
-
-        <div id="loan-fields" class="loan-fields">
-            <div class="form-group">
-                <label>Monthly Loan Payment (in Dollars):</label>
-                <input type="number" name="monthly_loan_payment" step="0.01">
+                <div class="form-group">
+                    <label>Is your emergency fund fully provisioned?</label>
+                    <select name="emergency_fund" required>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                    <div class="help-text">An emergency fund should cover 3-6 months of expenses</div>
+                </div>
             </div>
 
+            <div class="card">
+            <div class="section-title"><i class="fas fa-globe icon"></i>Region Settings</div>
+
             <div class="form-group">
-                <label>Outstanding Loan Amount (in Dollars):</label>
-                <input type="number" name="outstanding_loan" step="0.01">
+                <label>Your Region/Country</label>
+                <select name="region" id="region-selector" onchange="updateCurrency()">
+                    <option value="US" selected>United States (USD - $)</option>
+                    <option value="IN">India (INR - ₹)</option>
+                    <option value="GB">United Kingdom (GBP - £)</option>
+                    <option value="CA">Canada (CAD - C$)</option>
+                    <option value="AU">Australia (AUD - A$)</option>
+                </select>
+            </div>
+
+            <div class="regional-info" id="regional-info">
+                <div class="economic-indicators">
+                    <div><strong>Inflation Rate:</strong> <span id="inflation-rate">3.7%</span></div>
+                    <div><strong>Avg. Income:</strong> <span id="average-income">$65,836</span></div>
+                    <div><strong>Interest Rate:</strong> <span id="interest-rate">5.25%</span></div>
+                </div>
+            </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title"><i class="fas fa-piggy-bank icon"></i>Investments & Loans</div>
+
+                <div class="form-group">
+                    <label>Are your saved funds invested?</label>
+                    <select name="funds_invested" required>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Type of Investment</label>
+                    <select name="investment_type">
+                        <option value="none">None</option>
+                        <option value="stocks">Stocks</option>
+                        <option value="bonds">Bonds</option>
+                        <option value="mutual_funds">Mutual Funds</option>
+                        <option value="real_estate">Real Estate</option>
+                        <option value="mixed">Mixed Portfolio</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Expected Annual Return (%)</label>
+                    <input type="number" name="expected_return" value="0" step="0.1" placeholder="e.g. 7">
+                </div>
+
+                <div class="form-group">
+                    <label>Monthly Variance in Expenditure (in Dollars)</label>
+                    <input type="number" name="monthly_variance" required step="0.01" placeholder="e.g. 300">
+                    <div class="help-text">How much your spending varies month to month</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Do you have any loans?</label>
+                    <select name="has_loans" id="has_loans" required onchange="toggleLoanFields()">
+                        <option value="no">No</option>
+                        <option value="yes">Yes</option>
+                    </select>
+                </div>
+
+                <div id="loan-fields" class="loan-fields">
+                    <div class="form-group">
+                        <label>Monthly Loan Payment (in Dollars)</label>
+                        <input type="number" name="monthly_loan_payment" step="0.01" placeholder="e.g. 500">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Outstanding Loan Amount (in Dollars)</label>
+                        <input type="number" name="outstanding_loan" step="0.01" placeholder="e.g. 20000">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-navigation">
+                <button type="button" onclick="nextSection()">
+                    <i class="fas fa-arrow-right"></i> Next: Budget Breakdown
+                </button>
+                <button type="submit" class="calculate-button secondary">
+                    <i class="fas fa-calculator"></i> Skip to Calculate
+                </button>
             </div>
         </div>
 
-        <button type="submit">Calculate Financial Health</button>
+        <div class="form-section" id="section-2">
+            <div class="card">
+                <div class="section-title"><i class="fas fa-money-check-alt icon"></i>Monthly Budget Breakdown (Optional)</div>
+
+                <p>If you'd like to provide a breakdown of your expenses, fill in the categories below.</p>
+
+                <div class="budget-category">
+                    <label><i class="fas fa-home"></i> Housing</label>
+                    <input type="number" name="housing" step="0.01" value="0" placeholder="Rent/Mortgage">
+                </div>
+
+                <div class="budget-category">
+                    <label><i class="fas fa-car"></i> Transportation</label>
+                    <input type="number" name="transportation" step="0.01" value="0" placeholder="Car/Transit">
+                </div>
+
+                <div class="budget-category">
+                    <label><i class="fas fa-utensils"></i> Food</label>
+                    <input type="number" name="food" step="0.01" value="0" placeholder="Groceries/Dining">
+                </div>
+
+                <div class="budget-category">
+                    <label><i class="fas fa-lightbulb"></i> Utilities</label>
+                    <input type="number" name="utilities" step="0.01" value="0" placeholder="Electric/Water/etc.">
+                </div>
+
+                <div class="budget-category">
+                    <label><i class="fas fa-medkit"></i> Healthcare</label>
+                    <input type="number" name="healthcare" step="0.01" value="0" placeholder="Insurance/Medical">
+                </div>
+
+                <div class="budget-category">
+                    <label><i class="fas fa-film"></i> Entertainment</label>
+                    <input type="number" name="entertainment" step="0.01" value="0" placeholder="Movies/Streaming">
+                </div>
+
+                <div class="budget-category">
+                    <label><i class="fas fa-tshirt"></i> Personal</label>
+                    <input type="number" name="personal" step="0.01" value="0" placeholder="Clothing/Personal Care">
+                </div>
+
+                <div class="budget-category">
+                    <label><i class="fas fa-ellipsis-h"></i> Other</label>
+                    <input type="number" name="other" step="0.01" value="0" placeholder="Miscellaneous">
+                </div>
+            </div>
+
+            <div class="form-navigation">
+                <button type="button" class="secondary" onclick="prevSection()">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button type="submit" class="calculate-button">
+                    <i class="fas fa-calculator"></i> Calculate Financial Health
+                </button>
+            </div>
+        </div>
     </form>
 
     <script>
         function toggleLoanFields() {
             var hasLoans = document.getElementById('has_loans').value;
             var loanFields = document.getElementById('loan-fields');
-            loanFields.style.display = hasLoans === 'yes' ? 'block' : 'none';
+
+            if (hasLoans === 'yes') {
+                loanFields.style.display = 'block';
+            } else {
+                loanFields.style.display = 'none';
+            }
         }
+
+        function nextSection() {
+            // Form validation
+            const requiredFields = document.querySelectorAll('#section-1 [required]');
+            let valid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value) {
+                    valid = false;
+                    field.style.borderColor = '#ff4444';
+                } else {
+                    field.style.borderColor = '';
+                }
+            });
+
+            if (!valid) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Validate loan fields if loans are selected
+            if (document.getElementById('has_loans').value === 'yes') {
+                const loanPayment = document.querySelector('input[name="monthly_loan_payment"]');
+                const outstandingLoan = document.querySelector('input[name="outstanding_loan"]');
+
+                if (!loanPayment.value || !outstandingLoan.value) {
+                    valid = false;
+                    if (!loanPayment.value) loanPayment.style.borderColor = '#ff4444';
+                    if (!outstandingLoan.value) outstandingLoan.style.borderColor = '#ff4444';
+                    alert('Please fill in loan details');
+                    return;
+                }
+            }
+
+            // Switch to next section
+            document.getElementById('section-1').classList.remove('active');
+            document.getElementById('section-2').classList.add('active');
+            document.getElementById('step-1').classList.remove('active');
+            document.getElementById('step-2').classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function prevSection() {
+            document.getElementById('section-2').classList.remove('active');
+            document.getElementById('section-1').classList.add('active');
+            document.getElementById('step-2').classList.remove('active');
+            document.getElementById('step-1').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Currency conversion logic
+let currentCurrency = {
+    code: 'USD',
+    symbol: '$',
+    exchangeRate: 1
+};
+
+const regionData = {
+    'US': {
+        currency: { code: 'USD', symbol: '$', exchangeRate: 1 },
+        economic: { inflationRate: 3.7, averageIncome: 65836, interestRate: 5.25 }
+    },
+    'IN': {
+        currency: { code: 'INR', symbol: '₹', exchangeRate: 83.2 },
+        economic: { inflationRate: 5.6, averageIncome: 174984, interestRate: 6.5 }
+    },
+    'GB': {
+        currency: { code: 'GBP', symbol: '£', exchangeRate: 0.79 },
+        economic: { inflationRate: 4.6, averageIncome: 31461, interestRate: 5.25 }
+    },
+    'CA': {
+        currency: { code: 'CAD', symbol: 'C$', exchangeRate: 1.37 },
+        economic: { inflationRate: 3.8, averageIncome: 54630, interestRate: 5.0 }
+    },
+    'AU': {
+        currency: { code: 'AUD', symbol: 'A$', exchangeRate: 1.52 },
+        economic: { inflationRate: 5.4, averageIncome: 90329, interestRate: 4.35 }
+    }
+};
+
+function updateCurrency() {
+    const regionCode = document.getElementById('region-selector').value;
+    const regionInfo = regionData[regionCode];
+
+    if (!regionInfo) return;
+
+    // Update current currency info
+    currentCurrency = regionInfo.currency;
+
+    // Update placeholders and labels to show correct currency symbol
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        const placeholder = input.getAttribute('data-placeholder');
+        if (placeholder) {
+            input.placeholder = placeholder.replace('$', currentCurrency.symbol);
+        }
+    });
+
+    // Update economic information display
+    document.getElementById('inflation-rate').textContent = `${regionInfo.economic.inflationRate}%`;
+    document.getElementById('average-income').textContent = `${currentCurrency.symbol}${regionInfo.economic.averageIncome.toLocaleString()}`;
+    document.getElementById('interest-rate').textContent = `${regionInfo.economic.interestRate}%`;
+
+    // Add hidden input to store currency information
+    let currencyInput = document.getElementById('currency-data');
+    if (!currencyInput) {
+        currencyInput = document.createElement('input');
+        currencyInput.type = 'hidden';
+        currencyInput.id = 'currency-data';
+        currencyInput.name = 'currency_data';
+        document.getElementById('assessment-form').appendChild(currencyInput);
+    }
+    currencyInput.value = JSON.stringify(currentCurrency);
+}
+
+    // Store original placeholders
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.setAttribute('data-placeholder', input.placeholder || '');
+        });
+        updateCurrency();
+    });
+
+        // Initialize
+        window.onload = function() {
+            toggleLoanFields();
+        };
     </script>
 </body>
 </html>
