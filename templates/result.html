@@ -242,14 +242,14 @@
             </div>
         </div>
 
-        {% if budget_categories %}
+        <!-- {% if budget_categories %}
         <div class="card">
             <h2>Budget Breakdown</h2>
             <div class="chart-container">
                 <canvas id="budgetBreakdownChart"></canvas>
             </div>
         </div>
-        {% endif %}
+        {% endif %} -->
 
         <div class="card">
             <h2>Financial Health Components</h2>
@@ -365,7 +365,7 @@
                 </div>
             {% endif %}
 
-            <div class="resources-section">
+            <!-- <div class="resources-section">
                 <h3>Helpful Resources</h3>
                 <ul>
                     <li><a href="#"><i class="fas fa-book"></i> Guide to Emergency Funds</a></li>
@@ -373,7 +373,7 @@
                     <li><a href="#"><i class="fas fa-calculator"></i> Investment Calculator</a></li>
                     <li><a href="#"><i class="fas fa-file-invoice"></i> Budgeting Templates</a></li>
                 </ul>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -381,8 +381,11 @@
         <a href="/export/pdf/{{ analysis.id }}" class="action-button">
             <i class="fas fa-file-pdf"></i> Download as PDF
         </a>
-        <a href="/export/excel/{{ analysis.id }}" class="action-button">
+        <!-- <a href="/export/excel/{{ analysis.id }}" class="action-button">
             <i class="fas fa-file-excel"></i> Download as Excel
+        </a> -->
+        <a href="/export/csv/{{ analysis.id }}" class="action-button">
+            <i class="fas fa-file-csv"></i> Download as CSV
         </a>
         <a href="/" class="action-button">
             <i class="fas fa-redo"></i> Start New Assessment

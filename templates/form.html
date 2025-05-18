@@ -167,6 +167,11 @@
             margin-top: 5px;
         }
 
+        .required:after {
+            content:" *";
+            color: red;
+        }
+
         /* Icon styling */
         .icon {
             margin-right: 8px;
@@ -198,18 +203,18 @@
                 <div class="section-title"><i class="fas fa-rupee-sign icon"></i>Income & Savings</div>
 
                 <div class="form-group">
-                    <label>Monthly Income (in Rupees)</label>
+                    <label class="required">Monthly Income (in Rupees)</label>
                     <input type="number" name="monthly_income" required step="0.01" placeholder="e.g. 5000">
                 </div>
 
                 <div class="form-group">
-                    <label>Savings Percentage (%)</label>
+                    <label class="required">Savings Percentage (%)</label>
                     <input type="number" name="savings_percentage" required min="0" max="100" step="0.1" placeholder="e.g. 20">
                     <div class="help-text">Aim for at least 20% of your income</div>
                 </div>
 
                 <div class="form-group">
-                    <label>Is your emergency fund fully provisioned?</label>
+                    <label class="required">Is your emergency fund fully provisioned?</label>
                     <select name="emergency_fund" required>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
@@ -220,17 +225,6 @@
 
             <div class="card">
             <div class="section-title"><i class="fas fa-globe icon"></i>Region Settings</div>
-
-            <!-- <div class="form-group">
-                <label>Your Region/Country</label>
-                <select name="region" id="region-selector" onchange="updateCurrency()">
-                    <option value="US" selected>United States (USD - $)</option>
-                    <option value="IN">India (INR - ₹)</option>
-                    <option value="GB">United Kingdom (GBP - £)</option>
-                    <option value="CA">Canada (CAD - C$)</option>
-                    <option value="AU">Australia (AUD - A$)</option>
-                </select>
-            </div> -->
 
             <div class="regional-info" id="regional-info">
                 <div class="economic-indicators">
@@ -245,38 +239,38 @@
                 <div class="section-title"><i class="fas fa-piggy-bank icon"></i>Investments & Loans</div>
 
                 <div class="form-group">
-                    <label>Are your saved funds invested?</label>
-                    <select name="funds_invested" required>
+                    <label class="required">Are your saved funds invested?</label>
+                    <select name="funds_invested" id="funds_invested" onchange="toggleInvestmentFields()" required>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="investment_type">
                     <label>Type of Investment</label>
                     <select name="investment_type">
-                        <option value="none">None</option>
+                        <!-- <option value="none">None</option> -->
+                        <option value="mixed">Mixed Portfolio</option>
                         <option value="stocks">Stocks</option>
                         <option value="bonds">Bonds</option>
                         <option value="mutual_funds">Mutual Funds</option>
                         <option value="real_estate">Real Estate</option>
-                        <option value="mixed">Mixed Portfolio</option>
                     </select>
-                </div>
+                <!-- </div>
 
-                <div class="form-group">
+                <div class="form-group"> -->
                     <label>Expected Annual Return (%)</label>
                     <input type="number" name="expected_return" value="0" step="0.1" placeholder="e.g. 7">
                 </div>
 
                 <div class="form-group">
-                    <label>Monthly Variance in Expenditure (in Rupees)</label>
+                    <label class="required">Monthly Variance in Expenditure (in Rupees)</label>
                     <input type="number" name="monthly_variance" required step="0.01" placeholder="e.g. 300">
                     <div class="help-text">How much your spending varies month to month</div>
                 </div>
 
                 <div class="form-group">
-                    <label>Do you have any loans?</label>
+                    <label class="required">Do you have any loans?</label>
                     <select name="has_loans" id="has_loans" required onchange="toggleLoanFields()">
                         <option value="no">No</option>
                         <option value="yes">Yes</option>
@@ -376,6 +370,17 @@
             }
         }
 
+        function toggleInvestmentFields() {
+            var hasInvestment = document.getElementById('funds_invested').value;
+            var investmentType = document.getElementById('investment_type');
+
+            if (hasInvestment === 'yes') {
+                investmentType.style.display = 'block';
+            } else {
+                investmentType.style.display = 'none';
+            }
+        }  
+
         function nextSection() {
             // Form validation
             const requiredFields = document.querySelectorAll('#section-1 [required]');
@@ -434,74 +439,10 @@ let currentCurrency = {
     exchangeRate: 1
 };
 
-// const regionData = {
-//     'US': {
-//         currency: { code: 'USD', symbol: '$', exchangeRate: 1 },
-//         economic: { inflationRate: 3.7, averageIncome: 65836, interestRate: 5.25 }
-//     },
-//     'IN': {
-//         currency: { code: 'INR', symbol: '₹', exchangeRate: 83.2 },
-//         economic: { inflationRate: 5.6, averageIncome: 174984, interestRate: 6.5 }
-//     },
-//     'GB': {
-//         currency: { code: 'GBP', symbol: '£', exchangeRate: 0.79 },
-//         economic: { inflationRate: 4.6, averageIncome: 31461, interestRate: 5.25 }
-//     },
-//     'CA': {
-//         currency: { code: 'CAD', symbol: 'C$', exchangeRate: 1.37 },
-//         economic: { inflationRate: 3.8, averageIncome: 54630, interestRate: 5.0 }
-//     },
-//     'AU': {
-//         currency: { code: 'AUD', symbol: 'A$', exchangeRate: 1.52 },
-//         economic: { inflationRate: 5.4, averageIncome: 90329, interestRate: 4.35 }
-//     }
-// };
-
-// function updateCurrency() {
-//     const regionCode = document.getElementById('region-selector').value;
-//     const regionInfo = regionData[regionCode];
-
-//     if (!regionInfo) return;
-
-//     // Update current currency info
-//     currentCurrency = regionInfo.currency;
-
-//     // Update placeholders and labels to show correct currency symbol
-//     document.querySelectorAll('input[type="number"]').forEach(input => {
-//         const placeholder = input.getAttribute('data-placeholder');
-//         if (placeholder) {
-//             input.placeholder = placeholder.replace('$', currentCurrency.symbol);
-//         }
-//     });
-
-//     // Update economic information display
-//     document.getElementById('inflation-rate').textContent = `${regionInfo.economic.inflationRate}%`;
-//     document.getElementById('average-income').textContent = `${currentCurrency.symbol}${regionInfo.economic.averageIncome.toLocaleString()}`;
-//     document.getElementById('interest-rate').textContent = `${regionInfo.economic.interestRate}%`;
-
-//     // Add hidden input to store currency information
-//     let currencyInput = document.getElementById('currency-data');
-//     if (!currencyInput) {
-//         currencyInput = document.createElement('input');
-//         currencyInput.type = 'hidden';
-//         currencyInput.id = 'currency-data';
-//         currencyInput.name = 'currency_data';
-//         document.getElementById('assessment-form').appendChild(currencyInput);
-//     }
-//     currencyInput.value = JSON.stringify(currentCurrency);
-// }
-
-    // // Store original placeholders
-    // document.addEventListener('DOMContentLoaded', function() {
-    //     document.querySelectorAll('input[type="number"]').forEach(input => {
-    //         input.setAttribute('data-placeholder', input.placeholder || '');
-    //     });
-    //     updateCurrency();
-    // });
-
         // Initialize
         window.onload = function() {
             toggleLoanFields();
+            toggleInvestmentFields();
         };
     </script>
 </body>

@@ -422,25 +422,34 @@ def generate_pdf(assessment_id):
 
         if assessment.get('score', 0) < 7:
             if assessment.get('emergency_fund') == 'no':
-                pdf.multi_cell(0, 10, "• Build an emergency fund covering 3-6 months of expenses.")
+                pdf.multi_cell(0, 10, "- Build an emergency fund covering 3-6 months of expenses.")
 
             if assessment.get('funds_invested') == 'no':
-                pdf.multi_cell(0, 10, "• Consider investing your savings to achieve long-term growth.")
+                pdf.multi_cell(0, 10, "- Consider investing your savings to achieve long-term growth.")
 
             loan_to_income_ratio = 0
             if assessment.get('has_loans') == 'yes' and assessment.get('monthly_income', 0) > 0:
                 loan_to_income_ratio = (assessment.get('monthly_loan_payment', 0) / assessment.get('monthly_income', 0) * 100)
 
             if loan_to_income_ratio > 40:
-                pdf.multi_cell(0, 10, "• Your loan burden is high. Consider debt consolidation or accelerated repayment.")
+                pdf.multi_cell(0, 10, "- Your loan burden is high. Consider debt consolidation or accelerated repayment.")
 
             if assessment.get('variance_percentage', 0) > 20:
-                pdf.multi_cell(0, 10, "• Your monthly expenditure varies significantly. Try to maintain more consistent spending habits.")
+                pdf.multi_cell(0, 10, "- Your monthly expenditure varies significantly. Try to maintain more consistent spending habits.")
 
             if assessment.get('savings_percentage', 0) < 20:
-                pdf.multi_cell(0, 10, "• Your savings rate could be improved. Aim to save at least 20% of your income.")
+                pdf.multi_cell(0, 10, "- Your savings rate could be improved. Aim to save at least 20% of your income.")
         else:
             pdf.multi_cell(0, 10, "Your financial health appears to be good! Continue maintaining your current financial habits.")
+
+        print(pdf)
+        pdf.add_page()
+        pdf.set_font("Arial", 'B', size=14)
+        pdf.cell(200, 10, "PERSONALIZED FINANCIAL RECOMMENDATIONS:", ln=True)
+        reco_text = generate_recommendations_text(assessment_id)
+        # print(reco_text)
+        pdf.set_font("Arial", size=11)
+        pdf.multi_cell(0, 10, reco_text)
 
         # Create a unique filename with the full path
         pdf_filename = os.path.join(os.getcwd(), f"financial_report_{assessment_id}.pdf")
@@ -455,79 +464,9 @@ def generate_pdf(assessment_id):
         import traceback
         traceback.print_exc()
         return None
-    
-    # assessment = get_assessment_details(assessment_id)
-    # if not assessment:
-    #     return None
-
-    # try:
-    #     # Use a direct HTML approach if pdfkit is not working
-    #     from fpdf import FPDF
-
-    #     class PDF(FPDF):
-    #         def header(self):
-    #             self.set_font('Arial', 'B', 15)
-    #             self.cell(0, 10, 'Financial Health Assessment Report', 0, 1, 'C')
-    #             self.ln(10)
-
-    #     pdf = PDF()
-    #     pdf.add_page()
-
-    #     # Add assessment date
-    #     pdf.set_font('Arial', 'B', 12)
-    #     pdf.cell(0, 10, f"Assessment Date: {assessment['date']}", 0, 1)
-    #     pdf.ln(5)
-
-    #     # Add score section
-    #     pdf.set_font('Arial', 'B', 14)
-    #     pdf.cell(0, 10, 'Financial Health Score', 0, 1)
-    #     pdf.set_font('Arial', '', 12)
-    #     pdf.cell(0, 10, f"{assessment['score']}/10", 0, 1)
-
-    #     score = assessment['score']
-    #     if score >= 7:
-    #         pdf.cell(0, 10, "Your financial health is in good condition.", 0, 1)
-    #     elif score >= 5:
-    #         pdf.cell(0, 10, "Your financial health is average. There are areas for improvement.", 0, 1)
-    #     else:
-    #         pdf.cell(0, 10, "Your financial health needs attention.", 0, 1)
-    #     pdf.ln(5)
-
-    #     # Add key metrics section
-    #     pdf.set_font('Arial', 'B', 14)
-    #     pdf.cell(0, 10, 'Key Financial Metrics', 0, 1)
-    #     pdf.set_font('Arial', '', 12)
-
-    #     monthly_savings = assessment['monthly_income'] * (assessment['savings_percentage'] / 100)
-    #     monthly_expenditure = assessment['monthly_income'] - monthly_savings
-
-    #     metrics = [
-    #         ('Monthly Income', f"₹{assessment['monthly_income']:.2f}"),
-    #         ('Savings Rate', f"{assessment['savings_percentage']}%"),
-    #         ('Monthly Savings', f"₹{monthly_savings:.2f}"),
-    #         ('Monthly Expenditure', f"₹{monthly_expenditure:.2f}")
-    #     ]
-
-    #     if assessment['has_loans'] == 'yes':
-    #         loan_to_income = assessment['monthly_loan_payment'] / assessment['monthly_income'] * 100
-    #         metrics.append(('Monthly Loan Payment', f"₹{assessment['monthly_loan_payment']:.2f}"))
-    #         metrics.append(('Loan to Income Ratio', f"{loan_to_income:.1f}%"))
-
-    #     # Print metrics as a list
-    #     for metric, value in metrics:
-    #         pdf.cell(90, 10, metric, 0, 0)
-    #         pdf.cell(0, 10, value, 0, 1)
-
-    #     pdf_filename = f"financial_report_{assessment_id}.pdf"
-    #     pdf.output(pdf_filename)
-    #     return pdf_filename
-
-    # except Exception as e:
-    #     print(f"PDF generation error: {e}")
-    #     return None
 
 # Generate Excel report
-def generate_excel(assessment_id):
+def generate_excel(assessment_id, format="xlsx"):
     assessment = get_assessment_details(assessment_id)
     if not assessment:
         return None
@@ -579,14 +518,23 @@ def generate_excel(assessment_id):
         }
         budget_df = pd.DataFrame(budget_data)
 
-    # Save to Excel
-    excel_filename = f"financial_report_{assessment_id}.xlsx"
-    with pd.ExcelWriter(excel_filename) as writer:
-        df.to_excel(writer, sheet_name='Financial Assessment', index=False)
-        if 'budget_categories' in assessment:
-            budget_df.to_excel(writer, sheet_name='Budget Breakdown', index=False)
+    if format == "xlsx":
+        # Save to Excel
+        excel_filename = f"financial_report_{assessment_id}.xlsx"
+        with pd.ExcelWriter(excel_filename) as writer:
+            df.to_excel(writer, sheet_name='Financial Assessment', index=False)
+            if 'budget_categories' in assessment:
+                budget_df.to_excel(writer, sheet_name='Budget Breakdown', index=False)
 
-    return excel_filename
+        return excel_filename
+    elif format == "csv":
+        # Save to CSV
+        csv_filename = f"financial_report_{assessment_id}.csv"
+        df.to_csv(csv_filename, index=False)
+        if 'budget_categories' in assessment:
+            budget_df.to_csv(csv_filename, mode='a', index=False)
+
+        return csv_filename
 
 # Application routes
 @app.route('/', methods=['GET', 'POST'])
@@ -1064,6 +1012,16 @@ def export_report(format, assessment_id):
                 download_name=f"financial_report_{assessment_id}.xlsx",
                 mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
+    elif format == 'csv':
+        csv_filename = generate_excel(assessment_id, "csv")
+        if csv_filename and os.path.exists(csv_filename):
+            return send_file(
+                csv_filename,
+                as_attachment=True,
+                download_name=f"financial_report_{assessment_id}.csv",
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+
 
     return redirect(url_for('view_assessment', assessment_id=assessment_id))
 
@@ -1155,16 +1113,157 @@ def export_history():
     df = pd.DataFrame(data)
 
     # Generate Excel file
-    excel_filename = f"financial_history_{username}.xlsx"
-    df.to_excel(excel_filename, index=False)
+    # excel_filename = f"financial_history_{username}.xlsx"
+    # df.to_excel(excel_filename, index=False)
+
+    # Generate CSV file
+    csv_filename = f"financial_history_{username}.csv"
+    df.to_csv(csv_filename, index=False)
+    
 
     return send_file(
-        excel_filename,
+        csv_filename,
         as_attachment=True,
-        download_name=excel_filename,
+        download_name=csv_filename,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 
+def generate_recommendations_text(assessment_id):
+    """
+    Generate personalized financial recommendations text based on user's financial analysis and country data.
+    
+    Args:
+        country_data (dict): Contains country-specific financial and economic data
+        analysis (dict): Contains user's financial analysis results
+    
+    Returns:
+        str: Formatted text with personalized financial recommendations
+    """
+    country_data = get_country_data('IN')
+
+    assessment = get_assessment_details(assessment_id)
+    if not assessment:
+        return None
+
+    monthly_income = assessment.get('monthly_income', 0)
+    savings_percentage = assessment.get('savings_percentage', 0)    
+    monthly_savings = monthly_income * (savings_percentage / 100)
+    monthly_expenditure = monthly_income - monthly_savings
+    
+    analysis = {
+            'id': assessment_id,
+            'monthly_income': monthly_income,
+            'savings_percentage': savings_percentage,
+            'emergency_fund': assessment.get('emergency_fund', 'no'),
+            'funds_invested': assessment.get('funds_invested', 'no'),
+            'investment_type': assessment.get('investment_type', 'none'),
+            'expected_return': assessment.get('expected_return', 0),
+            'monthly_savings': monthly_savings,
+            'monthly_expenditure': monthly_expenditure,
+            'monthly_variance': assessment.get('monthly_variance', 0),
+            'has_loans': assessment.get('has_loans', 'no'),
+            # 'loan_to_income_ratio': loan_to_income_ratio,
+            'variance_percentage': assessment.get('variance_percentage', 0),
+            'score': assessment.get('score', 0),
+            'region_code': 'IN',
+            'currency': 'INR',
+            'economic_data': country_data.get('economic_data', {})
+        }
+
+    if assessment.get('has_loans') == 'yes':
+        monthly_loan_payment = assessment.get('monthly_loan_payment', 0)
+        if monthly_loan_payment > 0:
+            analysis['monthly_loan_payment'] = monthly_loan_payment
+            analysis['outstanding_loan'] = assessment.get('outstanding_loan', 0)
+            analysis['loan_to_income_ratio'] = (monthly_loan_payment / monthly_income * 100) 
+        else:
+            analysis['outstanding_loan'] = 0
+            analysis['monthly_loan_payment'] = 0
+    
+    # Economic Context
+    recommendations_text = f"ECONOMIC CONTEXT FOR {country_data['name'].upper()}\n"
+    recommendations_text += f"- Current inflation rate is {country_data['economic_data']['inflation_rate']}%, which means your savings need to grow by at least this rate to maintain purchasing power.\n"
+    
+    income_comparison = "above" if analysis['monthly_income'] * 12 > country_data['economic_data']['average_income'] else "below"
+    recommendations_text += f"- Average income in {country_data['name']} is Rs.{country_data['economic_data']['average_income']}. Your income is {income_comparison} the national average.\n\n"
+    
+    # Priority Actions
+    recommendations_text += "PRIORITY ACTIONS"
+    
+    recommendations = []
+    
+    # Emergency Fund Check
+    if analysis.get('emergency_fund') == "no":
+        recommendations.append({
+            'priority': 'High',
+            'title': 'Build Emergency Fund',
+            'description': f"In {country_data['name']}, experts recommend keeping {country_data['financial_targets']['emergency_fund_months']} months of expenses in an easily accessible emergency fund.",
+            'action': f"Set aside a small amount each month specifically for emergencies until you reach {int(analysis['monthly_expenditure'] * country_data['financial_targets']['emergency_fund_months'])} INR."
+        })
+    
+    # Savings Rate Check
+    if analysis.get('savings_percentage') < country_data['financial_targets']['recommended_savings_rate']:
+        recommendations.append({
+            'priority': 'High',
+            'title': 'Increase Savings Rate',
+            'description': f"Your current savings rate ({analysis['savings_percentage']}%) is below the recommended {country_data['financial_targets']['recommended_savings_rate']}% for {country_data['name']}.",
+            'action': f"Identify areas to reduce spending. Consider automating savings to reach at least {int(analysis['monthly_income'] * country_data['financial_targets']['recommended_savings_rate'] / 100)} INR per month."
+        })
+    
+    # Debt Burden Check
+    if analysis.get('has_loans') == "yes" and analysis.get('loan_to_income_ratio') > country_data['financial_targets']['max_loan_to_income']:
+        recommendations.append({
+            'priority': 'High',
+            'title': 'Reduce Debt Burden',
+            'description': f"Your loan-to-income ratio ({round(analysis['loan_to_income_ratio'], 1)}%) exceeds the recommended maximum of {country_data['financial_targets']['max_loan_to_income']}% for {country_data['name']}.",
+            'action': "Consider debt consolidation or refinancing. Focus on paying off high-interest debt first while maintaining minimum payments on other debts."
+        })
+    
+    # Investment Check
+    if analysis.get('funds_invested') == "no" and analysis.get('monthly_savings') > 0:
+        recommendations.append({
+            'priority': 'Medium',
+            'title': 'Start Investing',
+            'description': f"With inflation at {country_data['economic_data']['inflation_rate']}% in {country_data['name']}, your uninvested savings are losing purchasing power.",
+            'action': "Consider investing in low-cost index funds or speaking with a financial advisor about options suitable for your risk tolerance."
+        })
+    
+    # Spending Variance Check
+    if analysis.get('variance_percentage') > 20:
+        recommendations.append({
+            'priority': 'Medium',
+            'title': 'Stabilize Monthly Spending',
+            'description': f"Your spending varies significantly month-to-month ({round(analysis['variance_percentage'], 1)}% variance).",
+            'action': "Create a detailed budget for essential expenses. Consider using the envelope method or a budgeting app to track spending in real-time."
+        })
+    
+    # Investment Diversification Check
+    if analysis.get('investment_type') == "none" and analysis.get('funds_invested') == "yes":
+        recommendations.append({
+            'priority': 'Low',
+            'title': 'Diversify Investments',
+            'description': "You've indicated you're investing but haven't specified an investment type.",
+            'action': f"Consider a diversified portfolio appropriate for your age and risk tolerance. The current interest rate in {country_data['name']} is {country_data['economic_data']['interest_rate']}%."
+        })
+    
+    # Display recommendations by priority
+    for priority in ['High', 'Medium', 'Low']:
+        priority_recommendations = [rec for rec in recommendations if rec['priority'] == priority]
+        if priority_recommendations:
+            recommendations_text += f"\n{priority.upper()} PRIORITY:\n"
+            
+            for rec in priority_recommendations:
+                recommendations_text += f"* {rec['title']}\n"
+                recommendations_text += f"  {rec['description']}\n"
+                recommendations_text += f"  Action: {rec['action']}\n"
+    
+    # If no recommendations
+    if not recommendations:
+        recommendations_text += "\nYou're on the Right Track!\n"
+        recommendations_text += "Your financial health appears to be good! Continue maintaining your current financial habits.\n"
+        recommendations_text += "Action: Consider setting more ambitious financial goals or increasing your investments.\n"
+    
+    return recommendations_text
 
 if __name__ == '__main__':
     app.run(debug=True)
