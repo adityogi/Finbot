@@ -51,7 +51,7 @@ def init_db():
             monthly_loan_payment REAL,
             outstanding_loan REAL,
             score REAL,
-            region_code TEXT DEFAULT 'US',
+            region_code TEXT DEFAULT 'IN',
             currency_data TEXT,
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
@@ -62,7 +62,7 @@ def init_db():
             c.execute("SELECT region_code FROM assessments LIMIT 1")
         except sqlite3.OperationalError:
             # Add region_code column if it doesn't exist
-            c.execute("ALTER TABLE assessments ADD COLUMN region_code TEXT DEFAULT 'US'")
+            c.execute("ALTER TABLE assessments ADD COLUMN region_code TEXT DEFAULT 'IN'")
 
         # Check if currency_data column exists
         try:
@@ -102,7 +102,7 @@ def init_db():
             current_amount REAL,
             target_date TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            region_code TEXT DEFAULT 'US',
+            region_code TEXT DEFAULT 'IN',
             currency_symbol TEXT DEFAULT '$',
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
@@ -112,7 +112,7 @@ def init_db():
         try:
             c.execute("SELECT region_code FROM goals LIMIT 1")
         except sqlite3.OperationalError:
-            c.execute("ALTER TABLE goals ADD COLUMN region_code TEXT DEFAULT 'US'")
+            c.execute("ALTER TABLE goals ADD COLUMN region_code TEXT DEFAULT 'IN'")
 
         # Check if currency_symbol column exists in goals table
         try:
@@ -285,17 +285,23 @@ def load_region_data():
         # Return default data if file is missing or invalid
         return {"countries": [
             {
-                "name": "United States",
-                "code": "US",
+                "name": "India",
+                "code": "IN",
                 "currency": {
-                    "code": "USD",
-                    "symbol": "$",
-                    "exchange_rate": 1
+                    "code": "INR",
+                    "symbol": "₹",
+                    "exchange_rate": 83.2
                 },
                 "economic_data": {
-                    "inflation_rate": 3.7,
-                    "average_income": 65836,
-                    "interest_rate": 5.25
+                    "inflation_rate": 5.6,
+                    "average_income": 174984,
+                    "interest_rate": 6.5,
+                    "unemployment_rate": 7.1
+                },
+                "financial_targets": {
+                    "emergency_fund_months": 8,
+                    "recommended_savings_rate": 30,
+                    "max_loan_to_income": 40
                 }
             }
         ]}
@@ -306,17 +312,11 @@ def get_country_data(country_code):
     for country in regions.get("countries", []):
         if country.get("code") == country_code:
             return country
-    # Default to US if country not found
+    # Default to IN if country not found
     for country in regions.get("countries", []):
-        if country.get("code") == "US":
+        if country.get("code") == "IN":
             return country
     return None
-
-def convert_to_usd(amount, exchange_rate):
-    """Convert local currency to USD"""
-    if not amount:
-        return 0
-    return float(amount) / float(exchange_rate)
 
 def get_user_assessments(user_id):
     conn = sqlite3.connect(DB_NAME)
@@ -592,7 +592,7 @@ def generate_excel(assessment_id):
 def financial_health():
     if request.method == 'POST':
         # Get form data including region
-        region_code = request.form.get('region', 'US')
+        region_code = request.form.get('region', 'IN')
         country_data = get_country_data(region_code)
 
         # Get currency data
@@ -603,10 +603,10 @@ def financial_health():
             except:
                 pass
 
-        # Default to USD if currency data not available
+        # Default to INR if currency data not available
         exchange_rate = currency_data.get('exchangeRate', 1)
-        currency_symbol = currency_data.get('symbol', '$')
-        currency_code = currency_data.get('code', 'USD')
+        currency_symbol = currency_data.get('symbol', '₹')
+        currency_code = currency_data.get('code', 'INR')
 
         # Get form data
         form_data = {
@@ -643,7 +643,7 @@ def financial_health():
                 'other': float(request.form.get('other', 0)),
             }
 
-        # Calculate metrics (use local currency for UI but USD for calculations if needed)
+        # Calculate metrics (use local currency for UI but INR for calculations if needed)
         monthly_income = form_data['monthly_income']
         savings_percentage = form_data['savings_percentage']
         monthly_savings = monthly_income * (savings_percentage / 100)
@@ -748,7 +748,7 @@ def financial_health():
     # def xxx():
     if request.method == 'POST':
         # Get form data including region
-        region_code = request.form.get('region', 'US')
+        region_code = request.form.get('region', 'IN')
         country_data = get_country_data(region_code)
 
         # Get currency data
@@ -759,16 +759,13 @@ def financial_health():
             except:
                 pass
 
-        # Default to USD if currency data not available
+        # Default to INR if currency data not available
         exchange_rate = currency_data.get('exchangeRate', 1)
-        currency_symbol = currency_data.get('symbol', '$')
-        currency_code = currency_data.get('code', 'USD')
+        currency_symbol = currency_data.get('symbol', '₹')
+        currency_code = currency_data.get('code', 'INR')
 
         # Original data in local currency
-        local_monthly_income = float(request.form['monthly_income'])
-
-        # Convert to USD for calculations
-        monthly_income = convert_to_usd(local_monthly_income, exchange_rate)
+        monthly_income = float(request.form['monthly_income'])
 
         # The rest of your existing code for processing the form
         # Just add region_code, currency info to the saved assessment
@@ -961,15 +958,15 @@ def history():
             assessment['date'] = datetime.strptime(assessment['date'], '%Y-%m-%d %H:%M:%S')
 
         # Add region name
-        region_code = assessment.get('region_code', 'US')
+        region_code = assessment.get('region_code', 'IN')
         country_data = get_country_data(region_code)
-        assessment['region_name'] = country_data['name'] if country_data else 'United States'
+        assessment['region_name'] = country_data['name'] if country_data else 'India'
 
         # Add currency info if missing
         if 'currency' not in assessment:
             assessment['currency'] = {
-                'symbol': '$',
-                'code': 'USD',
+                'symbol': '₹',
+                'code': 'INR',
                 'exchange_rate': 1
             }
 
@@ -993,7 +990,7 @@ def history():
 
     # Add currency symbol to goals
     for goal in goals:
-        goal['currency_symbol'] = '$'  # Default
+        goal['currency_symbol'] = '₹'  # Default
         if 'region_code' in goal:
             country_data = get_country_data(goal['region_code'])
             if country_data and 'currency' in country_data:
@@ -1149,7 +1146,7 @@ def export_history():
             'Score': a['score'],
             'Monthly Income': a['monthly_income'],
             'Savings %': a['savings_percentage'],
-            'Region': a.get('region_code', 'US'),
+            'Region': a.get('region_code', 'IN'),
             'Emergency Fund': a['emergency_fund'],
             'Invested': a['funds_invested']
         })

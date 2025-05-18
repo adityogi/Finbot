@@ -201,7 +201,7 @@
             <div class="metrics-grid">
                 <div class="metric-box">
                     <div>Monthly Income</div>
-                    <div class="metric-value">${{ "%.0f"|format(analysis.monthly_income) }}</div>
+                    <div class="metric-value">₹{{ "%.0f"|format(analysis.monthly_income) }}</div>
                 </div>
 
                 <div class="metric-box">
@@ -211,18 +211,18 @@
 
                 <div class="metric-box">
                     <div>Monthly Savings</div>
-                    <div class="metric-value">${{ "%.0f"|format(analysis.monthly_savings) }}</div>
+                    <div class="metric-value">₹{{ "%.0f"|format(analysis.monthly_savings) }}</div>
                 </div>
 
                 <div class="metric-box">
                     <div>Monthly Expenses</div>
-                    <div class="metric-value">${{ "%.0f"|format(analysis.monthly_expenditure) }}</div>
+                    <div class="metric-value">₹{{ "%.0f"|format(analysis.monthly_expenditure) }}</div>
                 </div>
 
                 {% if analysis.monthly_loan_payment is defined %}
                 <div class="metric-box">
                     <div>Loan Payment</div>
-                    <div class="metric-value">${{ "%.0f"|format(analysis.monthly_loan_payment) }}</div>
+                    <div class="metric-value">₹{{ "%.0f"|format(analysis.monthly_loan_payment) }}</div>
                 </div>
 
                 <div class="metric-box">
@@ -371,7 +371,7 @@
                     <li><a href="#"><i class="fas fa-book"></i> Guide to Emergency Funds</a></li>
                     <li><a href="#"><i class="fas fa-university"></i> Debt Management Strategies</a></li>
                     <li><a href="#"><i class="fas fa-calculator"></i> Investment Calculator</a></li>
-                    <li><a href="#"><i class="fas fa-file-invoice-dollar"></i> Budgeting Templates</a></li>
+                    <li><a href="#"><i class="fas fa-file-invoice"></i> Budgeting Templates</a></li>
                 </ul>
             </div>
         </div>
@@ -428,7 +428,7 @@
                 data: {
                     labels: ['Housing', 'Transport', 'Food', 'Utilities', 'Healthcare', 'Entertainment', 'Personal', 'Other'],
                     datasets: [{
-                        label: 'Amount ($)',
+                        label: 'Amount (₹)',
                         data: [
                             {{ budget_categories.housing }},
                             {{ budget_categories.transportation }},

@@ -58,12 +58,12 @@
             </div>
             
             <div class="form-group">
-                <label>Target Amount (in Dollars):</label>
+                <label>Target Amount (in Rupees):</label>
                 <input type="number" name="goal_amount" required step="0.01" min="1">
             </div>
             
             <div class="form-group">
-                <label>Current Amount (in Dollars):</label>
+                <label>Current Amount (in Rupees):</label>
                 <input type="number" name="current_amount" step="0.01" value="0" min="0">
             </div>
             
@@ -93,8 +93,8 @@
                 {% for goal in goals %}
                 <tr>
                     <td>{{ goal.goal_name }}</td>
-                    <td>${{ "%.2f"|format(goal.goal_amount) }}</td>
-                    <td>${{ "%.2f"|format(goal.current_amount) }}</td>
+                    <td>₹{{ "%.2f"|format(goal.goal_amount) }}</td>
+                    <td>₹{{ "%.2f"|format(goal.current_amount) }}</td>
                     <td>
                         {% set progress = (goal.current_amount / goal.goal_amount * 100)|round %}
                         <div class="progress-container">

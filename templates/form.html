@@ -195,10 +195,10 @@
     <form method="POST" id="assessment-form">
         <div class="form-section active" id="section-1">
             <div class="card">
-                <div class="section-title"><i class="fas fa-dollar-sign icon"></i>Income & Savings</div>
+                <div class="section-title"><i class="fas fa-rupee-sign icon"></i>Income & Savings</div>
 
                 <div class="form-group">
-                    <label>Monthly Income (in Dollars)</label>
+                    <label>Monthly Income (in Rupees)</label>
                     <input type="number" name="monthly_income" required step="0.01" placeholder="e.g. 5000">
                 </div>
 
@@ -221,7 +221,7 @@
             <div class="card">
             <div class="section-title"><i class="fas fa-globe icon"></i>Region Settings</div>
 
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label>Your Region/Country</label>
                 <select name="region" id="region-selector" onchange="updateCurrency()">
                     <option value="US" selected>United States (USD - $)</option>
@@ -230,13 +230,13 @@
                     <option value="CA">Canada (CAD - C$)</option>
                     <option value="AU">Australia (AUD - A$)</option>
                 </select>
-            </div>
+            </div> -->
 
             <div class="regional-info" id="regional-info">
                 <div class="economic-indicators">
-                    <div><strong>Inflation Rate:</strong> <span id="inflation-rate">3.7%</span></div>
-                    <div><strong>Avg. Income:</strong> <span id="average-income">$65,836</span></div>
-                    <div><strong>Interest Rate:</strong> <span id="interest-rate">5.25%</span></div>
+                    <div><strong>Inflation Rate:</strong> <span id="inflation-rate">5.6%</span></div>
+                    <div><strong>Avg. Income:</strong> <span id="average-income">₹1,74,984</span></div>
+                    <div><strong>Interest Rate:</strong> <span id="interest-rate">6.5%</span></div>
                 </div>
             </div>
             </div>
@@ -270,7 +270,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Monthly Variance in Expenditure (in Dollars)</label>
+                    <label>Monthly Variance in Expenditure (in Rupees)</label>
                     <input type="number" name="monthly_variance" required step="0.01" placeholder="e.g. 300">
                     <div class="help-text">How much your spending varies month to month</div>
                 </div>
@@ -285,12 +285,12 @@
 
                 <div id="loan-fields" class="loan-fields">
                     <div class="form-group">
-                        <label>Monthly Loan Payment (in Dollars)</label>
+                        <label>Monthly Loan Payment (in Rupees)</label>
                         <input type="number" name="monthly_loan_payment" step="0.01" placeholder="e.g. 500">
                     </div>
 
                     <div class="form-group">
-                        <label>Outstanding Loan Amount (in Dollars)</label>
+                        <label>Outstanding Loan Amount (in Rupees)</label>
                         <input type="number" name="outstanding_loan" step="0.01" placeholder="e.g. 20000">
                     </div>
                 </div>
@@ -429,75 +429,75 @@
 
         // Currency conversion logic
 let currentCurrency = {
-    code: 'USD',
-    symbol: '$',
+    code: 'INR',
+    symbol: '₹',
     exchangeRate: 1
 };
 
-const regionData = {
-    'US': {
-        currency: { code: 'USD', symbol: '$', exchangeRate: 1 },
-        economic: { inflationRate: 3.7, averageIncome: 65836, interestRate: 5.25 }
-    },
-    'IN': {
-        currency: { code: 'INR', symbol: '₹', exchangeRate: 83.2 },
-        economic: { inflationRate: 5.6, averageIncome: 174984, interestRate: 6.5 }
-    },
-    'GB': {
-        currency: { code: 'GBP', symbol: '£', exchangeRate: 0.79 },
-        economic: { inflationRate: 4.6, averageIncome: 31461, interestRate: 5.25 }
-    },
-    'CA': {
-        currency: { code: 'CAD', symbol: 'C$', exchangeRate: 1.37 },
-        economic: { inflationRate: 3.8, averageIncome: 54630, interestRate: 5.0 }
-    },
-    'AU': {
-        currency: { code: 'AUD', symbol: 'A$', exchangeRate: 1.52 },
-        economic: { inflationRate: 5.4, averageIncome: 90329, interestRate: 4.35 }
-    }
-};
+// const regionData = {
+//     'US': {
+//         currency: { code: 'USD', symbol: '$', exchangeRate: 1 },
+//         economic: { inflationRate: 3.7, averageIncome: 65836, interestRate: 5.25 }
+//     },
+//     'IN': {
+//         currency: { code: 'INR', symbol: '₹', exchangeRate: 83.2 },
+//         economic: { inflationRate: 5.6, averageIncome: 174984, interestRate: 6.5 }
+//     },
+//     'GB': {
+//         currency: { code: 'GBP', symbol: '£', exchangeRate: 0.79 },
+//         economic: { inflationRate: 4.6, averageIncome: 31461, interestRate: 5.25 }
+//     },
+//     'CA': {
+//         currency: { code: 'CAD', symbol: 'C$', exchangeRate: 1.37 },
+//         economic: { inflationRate: 3.8, averageIncome: 54630, interestRate: 5.0 }
+//     },
+//     'AU': {
+//         currency: { code: 'AUD', symbol: 'A$', exchangeRate: 1.52 },
+//         economic: { inflationRate: 5.4, averageIncome: 90329, interestRate: 4.35 }
+//     }
+// };
 
-function updateCurrency() {
-    const regionCode = document.getElementById('region-selector').value;
-    const regionInfo = regionData[regionCode];
+// function updateCurrency() {
+//     const regionCode = document.getElementById('region-selector').value;
+//     const regionInfo = regionData[regionCode];
 
-    if (!regionInfo) return;
+//     if (!regionInfo) return;
 
-    // Update current currency info
-    currentCurrency = regionInfo.currency;
+//     // Update current currency info
+//     currentCurrency = regionInfo.currency;
 
-    // Update placeholders and labels to show correct currency symbol
-    document.querySelectorAll('input[type="number"]').forEach(input => {
-        const placeholder = input.getAttribute('data-placeholder');
-        if (placeholder) {
-            input.placeholder = placeholder.replace('$', currentCurrency.symbol);
-        }
-    });
+//     // Update placeholders and labels to show correct currency symbol
+//     document.querySelectorAll('input[type="number"]').forEach(input => {
+//         const placeholder = input.getAttribute('data-placeholder');
+//         if (placeholder) {
+//             input.placeholder = placeholder.replace('$', currentCurrency.symbol);
+//         }
+//     });
 
-    // Update economic information display
-    document.getElementById('inflation-rate').textContent = `${regionInfo.economic.inflationRate}%`;
-    document.getElementById('average-income').textContent = `${currentCurrency.symbol}${regionInfo.economic.averageIncome.toLocaleString()}`;
-    document.getElementById('interest-rate').textContent = `${regionInfo.economic.interestRate}%`;
+//     // Update economic information display
+//     document.getElementById('inflation-rate').textContent = `${regionInfo.economic.inflationRate}%`;
+//     document.getElementById('average-income').textContent = `${currentCurrency.symbol}${regionInfo.economic.averageIncome.toLocaleString()}`;
+//     document.getElementById('interest-rate').textContent = `${regionInfo.economic.interestRate}%`;
 
-    // Add hidden input to store currency information
-    let currencyInput = document.getElementById('currency-data');
-    if (!currencyInput) {
-        currencyInput = document.createElement('input');
-        currencyInput.type = 'hidden';
-        currencyInput.id = 'currency-data';
-        currencyInput.name = 'currency_data';
-        document.getElementById('assessment-form').appendChild(currencyInput);
-    }
-    currencyInput.value = JSON.stringify(currentCurrency);
-}
+//     // Add hidden input to store currency information
+//     let currencyInput = document.getElementById('currency-data');
+//     if (!currencyInput) {
+//         currencyInput = document.createElement('input');
+//         currencyInput.type = 'hidden';
+//         currencyInput.id = 'currency-data';
+//         currencyInput.name = 'currency_data';
+//         document.getElementById('assessment-form').appendChild(currencyInput);
+//     }
+//     currencyInput.value = JSON.stringify(currentCurrency);
+// }
 
-    // Store original placeholders
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('input[type="number"]').forEach(input => {
-            input.setAttribute('data-placeholder', input.placeholder || '');
-        });
-        updateCurrency();
-    });
+    // // Store original placeholders
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     document.querySelectorAll('input[type="number"]').forEach(input => {
+    //         input.setAttribute('data-placeholder', input.placeholder || '');
+    //     });
+    //     updateCurrency();
+    // });
 
         // Initialize
         window.onload = function() {

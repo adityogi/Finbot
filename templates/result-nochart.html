@@ -23,8 +23,8 @@
 
     <div class="result-box">
         <h2>Detailed Analysis:</h2>
-        <p>Monthly Savings: ${{ "%.2f"|format(analysis.monthly_savings) }}</p>
-        <p>Monthly Expenditure: ${{ "%.2f"|format(analysis.monthly_expenditure) }}</p>
+        <p>Monthly Savings: ₹{{ "%.2f"|format(analysis.monthly_savings) }}</p>
+        <p>Monthly Expenditure: ₹{{ "%.2f"|format(analysis.monthly_expenditure) }}</p>
         <p>Loan to Income Ratio: {{ "%.1f"|format(analysis.loan_to_income_ratio) }}%</p>
         <p>Monthly Expenditure Variance: {{ "%.1f"|format(analysis.variance_percentage) }}%</p>
     </div>
