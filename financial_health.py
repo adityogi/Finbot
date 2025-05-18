@@ -279,12 +279,7 @@ def get_user_goals(user_id):
 def load_region_data():
     """Load region data from JSON file"""
     try:
-        with open("new.json", "w") as f:
-            json.dump({"a": "apple", "b": "banana"}, f)
         with open('regions.json', 'r') as f:
-            lines = f.readlines()
-            print(lines)
-
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         # Return default data if file is missing or invalid
@@ -399,10 +394,10 @@ def generate_pdf(assessment_id):
         monthly_expenditure = monthly_income - monthly_savings
 
         metrics = [
-            ("Monthly Income", f"₹{monthly_income:.2f}"),
+            ("Monthly Income", f"{monthly_income:.2f}"),
             ("Savings Percentage", f"{savings_percentage:.1f}%"),
-            ("Monthly Savings", f"₹{monthly_savings:.2f}"),
-            ("Monthly Expenditure", f"₹{monthly_expenditure:.2f}")
+            ("Monthly Savings", f"{monthly_savings:.2f}"),
+            ("Monthly Expenditure", f"{monthly_expenditure:.2f}")
         ]
 
         # Add loan information if applicable
@@ -410,7 +405,7 @@ def generate_pdf(assessment_id):
             monthly_loan_payment = assessment.get('monthly_loan_payment', 0)
             loan_to_income_ratio = (monthly_loan_payment / monthly_income * 100) if monthly_income > 0 else 0
 
-            metrics.append(("Monthly Loan Payment", f"₹{monthly_loan_payment:.2f}"))
+            metrics.append(("Monthly Loan Payment", f"{monthly_loan_payment:.2f}"))
             metrics.append(("Loan to Income Ratio", f"{loan_to_income_ratio:.1f}%"))
 
         # Print metrics
@@ -461,75 +456,75 @@ def generate_pdf(assessment_id):
         traceback.print_exc()
         return None
     
-    assessment = get_assessment_details(assessment_id)
-    if not assessment:
-        return None
+    # assessment = get_assessment_details(assessment_id)
+    # if not assessment:
+    #     return None
 
-    try:
-        # Use a direct HTML approach if pdfkit is not working
-        from fpdf import FPDF
+    # try:
+    #     # Use a direct HTML approach if pdfkit is not working
+    #     from fpdf import FPDF
 
-        class PDF(FPDF):
-            def header(self):
-                self.set_font('Arial', 'B', 15)
-                self.cell(0, 10, 'Financial Health Assessment Report', 0, 1, 'C')
-                self.ln(10)
+    #     class PDF(FPDF):
+    #         def header(self):
+    #             self.set_font('Arial', 'B', 15)
+    #             self.cell(0, 10, 'Financial Health Assessment Report', 0, 1, 'C')
+    #             self.ln(10)
 
-        pdf = PDF()
-        pdf.add_page()
+    #     pdf = PDF()
+    #     pdf.add_page()
 
-        # Add assessment date
-        pdf.set_font('Arial', 'B', 12)
-        pdf.cell(0, 10, f"Assessment Date: {assessment['date']}", 0, 1)
-        pdf.ln(5)
+    #     # Add assessment date
+    #     pdf.set_font('Arial', 'B', 12)
+    #     pdf.cell(0, 10, f"Assessment Date: {assessment['date']}", 0, 1)
+    #     pdf.ln(5)
 
-        # Add score section
-        pdf.set_font('Arial', 'B', 14)
-        pdf.cell(0, 10, 'Financial Health Score', 0, 1)
-        pdf.set_font('Arial', '', 12)
-        pdf.cell(0, 10, f"{assessment['score']}/10", 0, 1)
+    #     # Add score section
+    #     pdf.set_font('Arial', 'B', 14)
+    #     pdf.cell(0, 10, 'Financial Health Score', 0, 1)
+    #     pdf.set_font('Arial', '', 12)
+    #     pdf.cell(0, 10, f"{assessment['score']}/10", 0, 1)
 
-        score = assessment['score']
-        if score >= 7:
-            pdf.cell(0, 10, "Your financial health is in good condition.", 0, 1)
-        elif score >= 5:
-            pdf.cell(0, 10, "Your financial health is average. There are areas for improvement.", 0, 1)
-        else:
-            pdf.cell(0, 10, "Your financial health needs attention.", 0, 1)
-        pdf.ln(5)
+    #     score = assessment['score']
+    #     if score >= 7:
+    #         pdf.cell(0, 10, "Your financial health is in good condition.", 0, 1)
+    #     elif score >= 5:
+    #         pdf.cell(0, 10, "Your financial health is average. There are areas for improvement.", 0, 1)
+    #     else:
+    #         pdf.cell(0, 10, "Your financial health needs attention.", 0, 1)
+    #     pdf.ln(5)
 
-        # Add key metrics section
-        pdf.set_font('Arial', 'B', 14)
-        pdf.cell(0, 10, 'Key Financial Metrics', 0, 1)
-        pdf.set_font('Arial', '', 12)
+    #     # Add key metrics section
+    #     pdf.set_font('Arial', 'B', 14)
+    #     pdf.cell(0, 10, 'Key Financial Metrics', 0, 1)
+    #     pdf.set_font('Arial', '', 12)
 
-        monthly_savings = assessment['monthly_income'] * (assessment['savings_percentage'] / 100)
-        monthly_expenditure = assessment['monthly_income'] - monthly_savings
+    #     monthly_savings = assessment['monthly_income'] * (assessment['savings_percentage'] / 100)
+    #     monthly_expenditure = assessment['monthly_income'] - monthly_savings
 
-        metrics = [
-            ('Monthly Income', f"₹{assessment['monthly_income']:.2f}"),
-            ('Savings Rate', f"{assessment['savings_percentage']}%"),
-            ('Monthly Savings', f"₹{monthly_savings:.2f}"),
-            ('Monthly Expenditure', f"₹{monthly_expenditure:.2f}")
-        ]
+    #     metrics = [
+    #         ('Monthly Income', f"₹{assessment['monthly_income']:.2f}"),
+    #         ('Savings Rate', f"{assessment['savings_percentage']}%"),
+    #         ('Monthly Savings', f"₹{monthly_savings:.2f}"),
+    #         ('Monthly Expenditure', f"₹{monthly_expenditure:.2f}")
+    #     ]
 
-        if assessment['has_loans'] == 'yes':
-            loan_to_income = assessment['monthly_loan_payment'] / assessment['monthly_income'] * 100
-            metrics.append(('Monthly Loan Payment', f"₹{assessment['monthly_loan_payment']:.2f}"))
-            metrics.append(('Loan to Income Ratio', f"{loan_to_income:.1f}%"))
+    #     if assessment['has_loans'] == 'yes':
+    #         loan_to_income = assessment['monthly_loan_payment'] / assessment['monthly_income'] * 100
+    #         metrics.append(('Monthly Loan Payment', f"₹{assessment['monthly_loan_payment']:.2f}"))
+    #         metrics.append(('Loan to Income Ratio', f"{loan_to_income:.1f}%"))
 
-        # Print metrics as a list
-        for metric, value in metrics:
-            pdf.cell(90, 10, metric, 0, 0)
-            pdf.cell(0, 10, value, 0, 1)
+    #     # Print metrics as a list
+    #     for metric, value in metrics:
+    #         pdf.cell(90, 10, metric, 0, 0)
+    #         pdf.cell(0, 10, value, 0, 1)
 
-        pdf_filename = f"financial_report_{assessment_id}.pdf"
-        pdf.output(pdf_filename)
-        return pdf_filename
+    #     pdf_filename = f"financial_report_{assessment_id}.pdf"
+    #     pdf.output(pdf_filename)
+    #     return pdf_filename
 
-    except Exception as e:
-        print(f"PDF generation error: {e}")
-        return None
+    # except Exception as e:
+    #     print(f"PDF generation error: {e}")
+    #     return None
 
 # Generate Excel report
 def generate_excel(assessment_id):
