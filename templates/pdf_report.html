@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Financial Health Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0 auto; padding: 20px; }
+        .report-header { text-align: center; margin-bottom: 30px; }
+        .report-section { margin-bottom: 30px; }
+        .report-section h2 { color: #4CAF50; border-bottom: 1px solid #4CAF50; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="report-header">
+        <h1>Financial Health Assessment Report</h1>
+        <p>Generated on: {{ assessment.date }}</p>
+    </div>
+
+    <div class="report-section">
+        <h2>Summary</h2>
+        <p>Financial Health Score: {{ assessment.score }} / 10</p>
+        <p>
+            {% if assessment.score >= 7 %}
+                Your financial health is in good condition. Keep up the good work!
+            {% elif assessment.score >= 5 %}
+                Your financial health is average. There are areas for improvement.
+            {% else %}
+                Your financial health needs attention. Review the recommendations.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="report-section">
+        <h2>Key Financial Metrics</h2>
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Monthly Income</td>
+                <td>${{ "%.2f"|format(assessment.monthly_income) }}</td>
+            </tr>
+            <tr>
+                <td>Savings Rate</td>
+                <td>{{ "%.1f"|format(assessment.savings_percentage) }}%</td>
+            </tr>
+            <!-- Additional metrics as in assessment_detail.html -->
+        </table>
+    </div>
+
+    <!-- Include budget categories and recommendations sections -->
+</body>
+</html>

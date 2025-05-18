@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Financial Goals</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .result-box { border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 200px; padding: 5px; }
+        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+        .progress-container {
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+        }
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .nav-link {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-links">
+        <a href="/" class="nav-link">New Assessment</a>
+        <a href="/history" class="nav-link">History</a>
+        <a href="/goals" class="nav-link">Financial Goals</a>
+    </div>
+
+    <h1>Your Financial Goals</h1>
+
+    <div class="result-box">
+        <h2>Add New Goal</h2>
+        <form method="POST" action="/goals">
+            <div class="form-group">
+                <label>Goal Name:</label>
+                <input type="text" name="goal_name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Target Amount (in Dollars):</label>
+                <input type="number" name="goal_amount" required step="0.01" min="1">
+            </div>
+            
+            <div class="form-group">
+                <label>Current Amount (in Dollars):</label>
+                <input type="number" name="current_amount" step="0.01" value="0" min="0">
+            </div>
+            
+            <div class="form-group">
+                <label>Target Date:</label>
+                <input type="date" name="target_date" required>
+            </div>
+            
+            <button type="submit">Add Goal</button>
+        </form>
+    </div>
+
+    {% if goals %}
+    <div class="result-box">
+        <h2>Your Goals</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Goal</th>
+                    <th>Target Amount</th>
+                    <th>Current Amount</th>
+                    <th>Progress</th>
+                    <th>Target Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for goal in goals %}
+                <tr>
+                    <td>{{ goal.goal_name }}</td>
+                    <td>${{ "%.2f"|format(goal.goal_amount) }}</td>
+                    <td>${{ "%.2f"|format(goal.current_amount) }}</td>
+                    <td>
+                        {% set progress = (goal.current_amount / goal.goal_amount * 100)|round %}
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: {{ progress }}%">{{ progress }}%</div>
+                        </div>
+                    </td>
+                    <td>{{ goal.target_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="result-box">
+        <p>You don't have any goals yet. Add your first goal above!</p>
+    </div>
+    {% endif %}
+
+    <div class="result-box">
+        <h2>Tips for Setting Financial Goals</h2>
+        <ul>
+            <li><strong>Be Specific:</strong> Define exactly what you want to achieve.</li>
+            <li><strong>Make it Measurable:</strong> Set concrete amounts and deadlines.</li>
+            <li><strong>Be Realistic:</strong> Set ambitious but achievable goals.</li>
+            <li><strong>Prioritize:</strong> Focus on high-impact goals first.</li>
+            <li><strong>Review Regularly:</strong> Track your progress and adjust as needed.</li>
+        </ul>
+        
+        <h3>Common Financial Goals:</h3>
+        <ul>
+            <li>Emergency Fund (3-6 months of expenses)</li>
+            <li>Debt Repayment</li>
+            <li>Down Payment for a Home</li>
+            <li>Retirement Savings</li>
+            <li>Education Fund</li>
+            <li>Vacation/Travel Fund</li>
+        </ul>
+    </div>
+</body>
+</html>
