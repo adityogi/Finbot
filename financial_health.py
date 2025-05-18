@@ -103,7 +103,7 @@ def init_db():
             target_date TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             region_code TEXT DEFAULT 'IN',
-            currency_symbol TEXT DEFAULT '$',
+            currency_symbol TEXT DEFAULT '₹',
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
         ''')
@@ -118,7 +118,7 @@ def init_db():
         try:
             c.execute("SELECT currency_symbol FROM goals LIMIT 1")
         except sqlite3.OperationalError:
-            c.execute("ALTER TABLE goals ADD COLUMN currency_symbol TEXT DEFAULT '$'")
+            c.execute("ALTER TABLE goals ADD COLUMN currency_symbol TEXT DEFAULT '₹'")
 
     conn.commit()
     conn.close()
@@ -279,7 +279,12 @@ def get_user_goals(user_id):
 def load_region_data():
     """Load region data from JSON file"""
     try:
+        with open("new.json", "w") as f:
+            json.dump({"a": "apple", "b": "banana"}, f)
         with open('regions.json', 'r') as f:
+            lines = f.readlines()
+            print(lines)
+
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         # Return default data if file is missing or invalid
@@ -394,10 +399,10 @@ def generate_pdf(assessment_id):
         monthly_expenditure = monthly_income - monthly_savings
 
         metrics = [
-            ("Monthly Income", f"${monthly_income:.2f}"),
+            ("Monthly Income", f"₹{monthly_income:.2f}"),
             ("Savings Percentage", f"{savings_percentage:.1f}%"),
-            ("Monthly Savings", f"${monthly_savings:.2f}"),
-            ("Monthly Expenditure", f"${monthly_expenditure:.2f}")
+            ("Monthly Savings", f"₹{monthly_savings:.2f}"),
+            ("Monthly Expenditure", f"₹{monthly_expenditure:.2f}")
         ]
 
         # Add loan information if applicable
@@ -405,7 +410,7 @@ def generate_pdf(assessment_id):
             monthly_loan_payment = assessment.get('monthly_loan_payment', 0)
             loan_to_income_ratio = (monthly_loan_payment / monthly_income * 100) if monthly_income > 0 else 0
 
-            metrics.append(("Monthly Loan Payment", f"${monthly_loan_payment:.2f}"))
+            metrics.append(("Monthly Loan Payment", f"₹{monthly_loan_payment:.2f}"))
             metrics.append(("Loan to Income Ratio", f"{loan_to_income_ratio:.1f}%"))
 
         # Print metrics
@@ -455,6 +460,7 @@ def generate_pdf(assessment_id):
         import traceback
         traceback.print_exc()
         return None
+    
     assessment = get_assessment_details(assessment_id)
     if not assessment:
         return None
@@ -501,15 +507,15 @@ def generate_pdf(assessment_id):
         monthly_expenditure = assessment['monthly_income'] - monthly_savings
 
         metrics = [
-            ('Monthly Income', f"${assessment['monthly_income']:.2f}"),
+            ('Monthly Income', f"₹{assessment['monthly_income']:.2f}"),
             ('Savings Rate', f"{assessment['savings_percentage']}%"),
-            ('Monthly Savings', f"${monthly_savings:.2f}"),
-            ('Monthly Expenditure', f"${monthly_expenditure:.2f}")
+            ('Monthly Savings', f"₹{monthly_savings:.2f}"),
+            ('Monthly Expenditure', f"₹{monthly_expenditure:.2f}")
         ]
 
         if assessment['has_loans'] == 'yes':
             loan_to_income = assessment['monthly_loan_payment'] / assessment['monthly_income'] * 100
-            metrics.append(('Monthly Loan Payment', f"${assessment['monthly_loan_payment']:.2f}"))
+            metrics.append(('Monthly Loan Payment', f"₹{assessment['monthly_loan_payment']:.2f}"))
             metrics.append(('Loan to Income Ratio', f"{loan_to_income:.1f}%"))
 
         # Print metrics as a list
@@ -544,17 +550,17 @@ def generate_excel(assessment_id):
         ],
         'Value': [
             assessment['date'],
-            f"${assessment['monthly_income']}",
+            f"₹{assessment['monthly_income']}",
             f"{assessment['savings_percentage']}%",
-            f"${monthly_savings}",
-            f"${monthly_expenditure}",
+            f"₹{monthly_savings}",
+            f"₹{monthly_expenditure}",
             assessment['emergency_fund'],
             assessment['funds_invested'],
             assessment['investment_type'],
             f"{assessment['expected_return']}%",
             assessment['has_loans'],
-            f"${assessment.get('monthly_loan_payment', 0)}",
-            f"${assessment.get('outstanding_loan', 0)}",
+            f"₹{assessment.get('monthly_loan_payment', 0)}",
+            f"₹{assessment.get('outstanding_loan', 0)}",
             f"{assessment['score']}/10"
         ]
     }
