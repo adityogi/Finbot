@@ -23,27 +23,4 @@ TABLE_SCHEMAS = {
         "region_code": str,
         "currency_data": str,
     },
-    # "budget_categories": {
-    #     "id": int,
-    #     "assessment_id": int,
-    #     "housing": float,
-    #     "transportation": float,
-    #     "food": float,
-    #     "utilities": float,
-    #     "healthcare": float,
-    #     "entertainment": float,
-    #     "personal": float,
-    #     "other": float,
-    # },
-    # "goals": {
-    #     "id": int,
-    #     "user_id": int,
-    #     "goal_name": str,
-    #     "goal_amount": float,
-    #     "current_amount": float,
-    #     "target_date": str,
-    #     "created_at": str,
-    #     "region_code": str,
-    #     "currency_symbol": str,
-    # }
 }
