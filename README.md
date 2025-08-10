@@ -76,7 +76,7 @@ Scores are adjusted by penalties and bonuses capped between 0 and 10.
 
 ## Summary Diagram
 
-![FinBot Flow Chart](flowchart.png "Flow Chart")
+![FinBot Flow Chart](Flowchart.png "Flow Chart")
 ***
 
 This documentation and flow visualization provide both technical and user-oriented understanding of how the financial health assessment application works, enabling smooth usage and maintenance.
