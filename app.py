@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file
-import json
 import os
 import pandas as pd
 import data_csv as db
@@ -10,7 +9,7 @@ print (f"flask app name is {__name__}")
 app = Flask(__name__,
             template_folder='templates',  # This should be the path to your templates
             static_folder='static')       # This should be the path to your static files
-app.secret_key = 'financial_health_secret_key'  # Required for session
+# app.secret_key = 'financial_health_secret_key'  # Required for session
 
 # Application routes
 @app.route('/', methods=['GET', 'POST'])
@@ -138,28 +137,6 @@ def financial_health():
 
     return render_template('form.html')
 
-# @app.route('/goals', methods=['GET', 'POST'])
-# def manage_goals():
-#     username = session.get('username')
-#     if not username:
-#         return redirect(url_for('financial_health'))
-
-#     user_id = db.get_or_create_user(username)
-
-#     if request.method == 'POST':
-#         goal_data = {
-#             'goal_name': request.form['goal_name'],
-#             'goal_amount': float(request.form['goal_amount']),
-#             'current_amount': float(request.form.get('current_amount', 0)),
-#             'target_date': request.form['target_date']
-#         }
-
-#         db.save_goal(user_id, goal_data)
-#         return redirect(url_for('manage_goals'))
-
-#     goals = db.get_user_goals(user_id)
-#     return render_template('goals.html', goals=goals)
-
 @app.route('/history')
 def history():
     username = session.get('username')
@@ -223,17 +200,6 @@ def history():
     assessment_dates = [a['date'].strftime('%d %b %Y') for a in sorted(assessments, key=lambda x: x['date'])]
     assessment_scores = [a['score'] for a in sorted(assessments, key=lambda x: x['date'])]
 
-    # Get goals
-    # goals = db.get_user_goals(user_id)
-
-    # # Add currency symbol to goals
-    # for goal in goals:
-    #     goal['currency_symbol'] = '₹'  # Default
-    #     if 'region_code' in goal:
-    #         country_data = db.get_country_data(goal['region_code'])
-    #         if country_data and 'currency' in country_data:
-    #             goal['currency_symbol'] = country_data['currency']['symbol']
-
     return render_template(
         'history.html',
         assessments=assessments,
@@ -243,7 +209,6 @@ def history():
         assessment_scores=assessment_scores,
         # goals=goals
     )
-
 
 @app.route('/assessment/<int:assessment_id>')
 def view_assessment(assessment_id):
@@ -494,13 +459,7 @@ def generate_excel(assessment_id, format="xlsx"):
 
     df = pd.DataFrame(data)
 
-    if format == "xlsx":
-        # Save to Excel
-        excel_filename = f"financial_report_{assessment_id}.xlsx"
-        with pd.ExcelWriter(excel_filename) as writer:
-            df.to_excel(writer, sheet_name='Financial Assessment', index=False)
-        return excel_filename
-    elif format == "csv":
+    if format == "csv":
         # Save to CSV
         csv_filename = f"financial_report_{assessment_id}.csv"
         df.to_csv(csv_filename, index=False)
