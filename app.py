@@ -9,12 +9,13 @@ print (f"flask app name is {__name__}")
 app = Flask(__name__,
             template_folder='templates',  # This should be the path to your templates
             static_folder='static')       # This should be the path to your static files
-# app.secret_key = 'financial_health_secret_key'  # Required for session
+app.secret_key = 'financial_health_secret_key'  # Required for session
 
 # Application routes
 @app.route('/', methods=['GET', 'POST'])
 def financial_health():
     if request.method == 'POST':
+        region_code = 'IN'
         # Get form data
         form_data = {
             'monthly_income': float(request.form['monthly_income']),
@@ -27,11 +28,10 @@ def financial_health():
             'has_loans': request.form['has_loans'],
             'monthly_loan_payment': float(request.form.get('monthly_loan_payment', 0)) if request.form.get('monthly_loan_payment') else 0,
             'outstanding_loan': float(request.form.get('outstanding_loan', 0)) if request.form.get('outstanding_loan') else 0,
-            'region_code': 'IN',
+            'region_code': region_code,
         }
 
         # Get form data including region
-        region_code = request.form.get('region', 'IN')
         country_data = db.get_country_data(region_code)
         # Store the currency data
         form_data['currency'] = country_data["currency"]
