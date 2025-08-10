@@ -74,11 +74,14 @@ def financial_health():
         monthly_income = form_data['monthly_income']
         savings_percentage = form_data['savings_percentage']
         monthly_savings = monthly_income * (savings_percentage / 100)
+        lowest_savings_percentage = (monthly_savings - form_data['monthly_variance']) * 100 / monthly_income
+        monthly_savings = monthly_income * (savings_percentage / 100)
         monthly_expenditure = monthly_income - monthly_savings
 
         # Calculate loan-to-income ratio
         if form_data['monthly_loan_payment'] > 0:
             loan_to_income_ratio = (form_data['monthly_loan_payment'] / monthly_income) * 100
+            monthly_expenditure = monthly_expenditure - form_data['monthly_loan_payment']
         else:
             loan_to_income_ratio = 0
 
@@ -141,6 +144,7 @@ def financial_health():
         analysis = {
             'id': assessment_id,
             'monthly_income': monthly_income,
+            'lowest_savings_percentage': lowest_savings_percentage,
             'savings_percentage': savings_percentage,
             'emergency_fund': form_data['emergency_fund'],
             'funds_invested': form_data['funds_invested'],
@@ -343,7 +347,7 @@ def manage_goals():
             'target_date': request.form['target_date']
         }
 
-        save_goal(user_id, goal_data)
+        db.save_goal(user_id, goal_data)
         return redirect(url_for('manage_goals'))
 
     goals = db.get_user_goals(user_id)

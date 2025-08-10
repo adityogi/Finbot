@@ -78,7 +78,12 @@
             font-size: 24px;
             font-weight: bold;
             margin: 10px 0;
+            color: #333;
         }
+
+        .metric-value.good { color: var(--primary); }
+        .metric-value.average { color: var(--accent); }
+        .metric-value.poor { color: var(--danger); }
 
         .actions {
             display: flex;
@@ -201,22 +206,37 @@
             <div class="metrics-grid">
                 <div class="metric-box">
                     <div>Monthly Income</div>
-                    <div class="metric-value">₹{{ "%.0f"|format(analysis.monthly_income) }}</div>
+                    <div class="metric-value {% if analysis.monthly_income <= 5000 %}poor{% elif analysis.score <= 12000 %}average{% else %}good{% endif %}">₹{{ "%.0f"|format(analysis.monthly_income) }}</div>
                 </div>
 
                 <div class="metric-box">
                     <div>Savings Rate</div>
-                    <div class="metric-value">{{ "%.1f"|format(analysis.savings_percentage) }}%</div>
+                    <div class="metric-value {% if analysis.savings_percentage <= 0.2 %}poor{% elif analysis.savings_percentage <= 0.3 %}average{% else %}good{% endif %}">
+                        {% if analysis.monthly_variance >0 %}
+                            {{ "%.1f"|format(analysis.lowest_savings_percentage) }}% -  
+                        {% endif %}
+                        {{ "%.1f"|format(analysis.savings_percentage) }}%
+                    </div>
                 </div>
 
                 <div class="metric-box">
                     <div>Monthly Savings</div>
-                    <div class="metric-value">₹{{ "%.0f"|format(analysis.monthly_savings) }}</div>
+                    <div class="metric-value">
+                        {% if analysis.monthly_variance >0 %}
+                            ₹{{ "%.0f - "|format(analysis.monthly_savings - analysis.monthly_variance) }} 
+                        {% endif %}
+                        ₹{{ "%.0f"|format(analysis.monthly_savings) }}
+                    </div>
                 </div>
 
                 <div class="metric-box">
                     <div>Monthly Expenses</div>
-                    <div class="metric-value">₹{{ "%.0f"|format(analysis.monthly_expenditure) }}</div>
+                    <div class="metric-value">
+                        ₹{{ "%.0f"|format(analysis.monthly_expenditure) }}
+                        {% if analysis.monthly_variance >0 %}
+                            {{ " - ₹%.0f"|format(analysis.monthly_expenditure + analysis.monthly_variance) }} 
+                        {% endif %}
+                    </div>
                 </div>
 
                 {% if analysis.monthly_loan_payment is defined %}
@@ -227,7 +247,7 @@
 
                 <div class="metric-box">
                     <div>Loan/Income Ratio</div>
-                    <div class="metric-value">{{ "%.1f"|format(analysis.loan_to_income_ratio) }}%</div>
+                    <div class="metric-value {% if analysis.loan_to_income_ratio >= 0.5 %}poor{% elif analysis.score >= 0.3 %}average{% else %}good{% endif %}">{{ "%.1f"|format(analysis.loan_to_income_ratio) }}%</div>
                 </div>
                 {% endif %}
             </div>
@@ -251,12 +271,12 @@
         </div>
         {% endif %} -->
 
-        <div class="card">
+        <!-- <div class="card">
             <h2>Financial Health Components</h2>
             <div class="chart-container">
                 <canvas id="financialHealthChart"></canvas>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <div class="tab-content" id="recommendations-tab">
@@ -378,9 +398,9 @@
     </div>
 
     <div class="actions">
-        <a href="/export/pdf/{{ analysis.id }}" class="action-button">
+        <!-- <a href="/export/pdf/{{ analysis.id }}" class="action-button">
             <i class="fas fa-file-pdf"></i> Download as PDF
-        </a>
+        </a> -->
         <!-- <a href="/export/excel/{{ analysis.id }}" class="action-button">
             <i class="fas fa-file-excel"></i> Download as Excel
         </a> -->
@@ -410,17 +430,39 @@
             {
                 type: 'pie',
                 data: {
-                    labels: ['Savings', 'Expenses'],
+                    labels: ['Loan', 'Savings', 'Variance', 'Expenses'],
                     datasets: [{
-                        data: [{{ analysis.monthly_savings }}, {{ analysis.monthly_expenditure }}],
-                        backgroundColor: ['#4CAF50', '#FF9800']
-                    }]
+                        data: [{{ analysis.monthly_loan_payment }}, 
+                        {{ analysis.monthly_savings - analysis.monthly_variance }}, 
+                        {{ analysis.monthly_variance}}, 
+                        {{ analysis.monthly_expenditure }}],
+                        backgroundColor: ['darkgrey', 'green', 'lightblue', 'coral'],
+                        borderColor: [
+                            'blue',  // Darker border for the shaded slice
+                            'transparent',
+                            'white',  // Darker border for the shaded slice
+                            'transparent'
+                        ],
+                        borderWidth: [
+                            1,
+                            0,
+                            2,  // Thicker border on the first slice (Loan)
+                            0
+                        ],
+                        // Optional: To "pull out" the shaded slice for emphasis
+                        offset: [
+                            0,
+                            0,
+                            2,  // Moves 'Loan' slice out by 10px
+                            0
+                        ],
+                    }],
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false
-                }
-            }
+                },
+            },
         );
 
         {% if budget_categories %}
