@@ -35,15 +35,15 @@ TABLE_SCHEMAS = {
         "personal": float,
         "other": float,
     },
-    "goals": {
-        "id": int,
-        "user_id": int,
-        "goal_name": str,
-        "goal_amount": float,
-        "current_amount": float,
-        "target_date": str,
-        "created_at": str,
-        "region_code": str,
-        "currency_symbol": str,
-    }
+    # "goals": {
+    #     "id": int,
+    #     "user_id": int,
+    #     "goal_name": str,
+    #     "goal_amount": float,
+    #     "current_amount": float,
+    #     "target_date": str,
+    #     "created_at": str,
+    #     "region_code": str,
+    #     "currency_symbol": str,
+    # }
 }

@@ -8,20 +8,20 @@ from schema import TABLE_SCHEMAS
 USERS_FILE = 'users.csv'
 ASSESSMENTS_FILE = 'assessments.csv'
 BUDGET_FILE = 'budget_categories.csv'
-GOALS_FILE = 'goals.csv'
+# GOALS_FILE = 'goals.csv'
 
 FILE_TO_SCHEMA = {
     USERS_FILE: TABLE_SCHEMAS["users"],
     ASSESSMENTS_FILE: TABLE_SCHEMAS["assessments"],
     BUDGET_FILE: TABLE_SCHEMAS["budget_categories"],
-    GOALS_FILE: TABLE_SCHEMAS["goals"],
+    # GOALS_FILE: TABLE_SCHEMAS["goals"],
 }
 
 # CSV schema definitions
 USERS_COLUMNS = list(TABLE_SCHEMAS["users"].keys())
 ASSESSMENTS_COLUMNS = list(TABLE_SCHEMAS["assessments"].keys())
 BUDGET_COLUMNS = list(TABLE_SCHEMAS["budget_categories"].keys())
-GOALS_COLUMNS = list(TABLE_SCHEMAS["goals"].keys())
+# GOALS_COLUMNS = list(TABLE_SCHEMAS["goals"].keys())
 
 # ---------- CSV Utility Functions ----------
 def init_csv_file(file, columns):
@@ -95,7 +95,7 @@ def init():
     init_csv_file(USERS_FILE, USERS_COLUMNS)
     init_csv_file(ASSESSMENTS_FILE, ASSESSMENTS_COLUMNS)
     init_csv_file(BUDGET_FILE, BUDGET_COLUMNS)
-    init_csv_file(GOALS_FILE, GOALS_COLUMNS)
+    # init_csv_file(GOALS_FILE, GOALS_COLUMNS)
     print("CSV storage system initialized successfully")
 
 # ---------- USER FUNCTIONS ----------
@@ -156,25 +156,25 @@ def save_budget_categories(assessment_id, categories):
         "other": categories.get("other")
     }, BUDGET_COLUMNS)
 
-# ---------- GOAL FUNCTIONS ----------
-def save_goal(user_id, goal_data):
-    goal_id = get_next_id(GOALS_FILE)
-    append_csv(GOALS_FILE, {
-        "id": goal_id,
-        "user_id": user_id,
-        "goal_name": goal_data["goal_name"],
-        "goal_amount": goal_data["goal_amount"],
-        "current_amount": goal_data.get("current_amount", 0),
-        "target_date": goal_data["target_date"],
-        "created_at": datetime.now().isoformat(sep=' ', timespec='seconds'),
-        "region_code": "IN",
-        "currency_symbol": "₹"
-    }, GOALS_COLUMNS)
-    return goal_id
+# # ---------- GOAL FUNCTIONS ----------
+# def save_goal(user_id, goal_data):
+#     goal_id = get_next_id(GOALS_FILE)
+#     append_csv(GOALS_FILE, {
+#         "id": goal_id,
+#         "user_id": user_id,
+#         "goal_name": goal_data["goal_name"],
+#         "goal_amount": goal_data["goal_amount"],
+#         "current_amount": goal_data.get("current_amount", 0),
+#         "target_date": goal_data["target_date"],
+#         "created_at": datetime.now().isoformat(sep=' ', timespec='seconds'),
+#         "region_code": "IN",
+#         "currency_symbol": "₹"
+#     }, GOALS_COLUMNS)
+#     return goal_id
 
-def get_user_goals(user_id):
-    rows = read_csv(GOALS_FILE)
-    return [r for r in rows if int(r["user_id"]) == user_id]
+# def get_user_goals(user_id):
+#     rows = read_csv(GOALS_FILE)
+#     return [r for r in rows if int(r["user_id"]) == user_id]
 
 # ---------- REGION DATA ----------
 def load_region_data():
@@ -213,6 +213,7 @@ def get_country_data(country_code):
         if c.get("code") == "IN":
             return c
     return None
+
 
 # ---------- FETCH FUNCTIONS ----------
 def get_user_assessments(user_id):

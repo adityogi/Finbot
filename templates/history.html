@@ -153,15 +153,15 @@
     <div class="nav-links">
         <a href="/" class="nav-link">New Assessment</a>
         <a href="/history" class="nav-link">History</a>
-        <a href="/goals" class="nav-link">Financial Goals</a>
+        <!-- <a href="/goals" class="nav-link">Financial Goals</a> -->
     </div>
 
     <h1><i class="fas fa-history"></i> Your Financial Health History</h1>
 
     {% if assessments %}
     <div class="card">
-        <div class="filters">
-            <div class="filter-group">
+        <!-- <div class="filters"> -->
+            <!-- <div class="filter-group">
                 <label for="year-filter">Year:</label>
                 <select id="year-filter" onchange="filterHistory()">
                     <option value="all">All Years</option>
@@ -169,9 +169,9 @@
                         <option value="{{ year }}">{{ year }}</option>
                     {% endfor %}
                 </select>
-            </div>
+            </div> -->
             
-            <div class="filter-group">
+            <!-- <div class="filter-group">
                 <label for="sort-by">Sort by:</label>
                 <select id="sort-by" onchange="filterHistory()">
                     <option value="date-desc">Date (Newest First)</option>
@@ -179,12 +179,12 @@
                     <option value="score-high">Score (Highest First)</option>
                     <option value="score-low">Score (Lowest First)</option>
                 </select>
-            </div>
+            </div> -->
             
             <button class="export-button" onclick="exportHistory()">
                 <i class="fas fa-file-export"></i> Export History
             </button>
-        </div>
+        <!-- </div> -->
         
         <div class="chart-container">
             <canvas id="historyChart"></canvas>
@@ -232,7 +232,7 @@
     </div>
     {% endif %}
 
-    {% if goals %}
+    <!-- {% if goals %}
     <div class="card">
         <h2>Your Financial Goals</h2>
         <table>
@@ -265,7 +265,7 @@
             </tbody>
         </table>
     </div>
-    {% endif %}
+    {% endif %} -->
 
     <script>
         // History chart initialization
