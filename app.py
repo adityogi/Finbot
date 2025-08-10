@@ -452,9 +452,17 @@ def view_assessment(assessment_id):
     if not assessment:
         return redirect(url_for('history'))
 
-    return render_template('assessment_detail.html',
+    country_data = db.get_country_data(assessment["region_code"])
+    print(country_data)
+    # Store the currency data
+    assessment['currency'] = {
+        'code': 'INR',
+        'symbol': '₹',
+        'exchange_rate': 1
+    }
+    return render_template('result.html',
                           analysis=assessment,
-                          budget_categories=assessment.get('budget_categories'))
+                          budget_categories=assessment.get('budget_categories'), country_data=country_data)
 
 @app.route('/export/<format>/<int:assessment_id>')
 def export_report(format, assessment_id):

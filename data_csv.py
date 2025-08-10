@@ -224,11 +224,21 @@ def get_assessment_details(assessment_id):
     assessment = next((r for r in assessments if int(r["id"]) == assessment_id), None)
     if not assessment:
         return None
-    
+
     budget_rows = read_csv(BUDGET_FILE)
     budget = next((b for b in budget_rows if int(b["assessment_id"]) == assessment_id), None)
     if budget:
         assessment["budget_categories"] = budget
+
+    if assessment["monthly_variance"] > 0:
+        monthly_savings = assessment["savings_percentage"] * assessment["monthly_income"] / 100
+        assessment["monthly_savings"] = monthly_savings
+        assessment["monthly_expenditure"] = assessment["monthly_income"] - monthly_savings
+        assessment['lowest_savings_percentage'] = 100 * (monthly_savings - assessment["monthly_variance"]) / assessment["monthly_income"]
+
+    assessment["loan_to_income_ratio"] = (assessment['monthly_loan_payment'] / assessment["monthly_income"]) * 100
+    assessment["variance_percentage"] = (assessment['monthly_variance'] / assessment["monthly_expenditure"]) * 100
+
     print(f"Assessment: {assessment}")
     return assessment
 
