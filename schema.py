@@ -1,4 +1,3 @@
-
 TABLE_SCHEMAS = {
     "users": {
         "id": int,

@@ -1,450 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Financial Health Assessment</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        :root {
-            --primary: #4CAF50;
-            --primary-dark: #388E3C;
-            --primary-light: #C8E6C9;
-            --accent: #FF9800;
-            --light-grey: #f5f5f5;
-            --border-radius: 8px;
-            --box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            color: var(--primary-dark);
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        button {
-            padding: 12px 20px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: var(--primary-dark);
-        }
-
-        button.secondary {
-            /* background-color: #f1f1f1; */
-            background-color: skyblue;
-            color: #333;
-        }
-
-        .loan-fields {
-            display: none;
-            background-color: var(--light-grey);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-top: 10px;
-        }
-
-        .form-section {
-            display: none;
-            animation: fadeIn 0.3s;
-        }
-
-        .form-section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .progress-indicator {
-            display: flex;
-            margin-bottom: 20px;
-        }
-
-        .step {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            background-color: #e9e9e9;
-            position: relative;
-            font-weight: 500;
-            border-radius: var(--border-radius);
-            margin: 0 5px;
-        }
-
-        .step.active {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .form-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .nav-links {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .nav-link {
-            padding: 10px 20px;
-            margin: 0 10px;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: var(--border-radius);
-        }
-
-        /* .budget-category {
-            display: inline-block;
-            width: 48%;
-            margin-right: 2%;
-            margin-bottom: 15px;
-        } */
-
-        .section-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: var(--primary-dark);
-            border-bottom: 2px solid var(--primary-light);
-            padding-bottom: 5px;
-        }
-
-        .help-text {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .required:after {
-            content:" *";
-            color: red;
-        }
-
-        /* Icon styling */
-        .icon {
-            margin-right: 8px;
-            color: var(--primary-dark);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Financial Health Assessment</title>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
-    <div class="nav-links">
-        <a href="/" class="nav-link">New Assessment</a>
-        <a href="/history" class="nav-link">History</a>
-        <!-- <a href="/goals" class="nav-link">Financial Goals</a> -->
+
+<header>
+  <nav class="nav-links">
+    <a href="/" class="nav-link">New Assessment</a>
+    <a href="/history" class="nav-link">History</a>
+  </nav>
+  <h1><i class="fas fa-chart-line"></i> Financial Health Assessment</h1>
+</header>
+
+<form method="POST" id="assessment-form">
+
+  <!-- Section 1 -->
+  <fieldset id="section-1" class="form-section active">
+    <legend><i class="fas fa-info-circle"></i> Basic Information</legend>
+
+    <label>Monthly Income (₹) <input type="number" name="monthly_income" required></label>
+
+    <label>Savings Percentage (%) 
+      <input type="number" name="savings_percentage" required min="0" max="100">
+      <small>Aim for at least 20%</small>
+    </label>
+
+    <label>Emergency Fund 
+      <select name="emergency_fund" required>
+        <option value="yes">Yes</option><option value="no">No</option>
+      </select>
+      <small>Should cover 3–6 months of expenses</small>
+    </label>
+
+    <h3><i class="fas fa-globe"></i> Region</h3>
+    <div class="economic-indicators">
+      <div><strong>Inflation:</strong> <span id="inflation-rate">5.6%</span></div>
+      <div><strong>Avg. Income:</strong> <span id="average-income">₹1,74,984</span></div>
+      <div><strong>Interest:</strong> <span id="interest-rate">6.5%</span></div>
     </div>
 
-    <h1><i class="fas fa-chart-line icon"></i> Financial Health Assessment</h1>
+    <h3><i class="fas fa-piggy-bank"></i> Investments & Loans</h3>
+    <label>Invested?
+      <select name="funds_invested" id="funds_invested" required>
+        <option value="yes">Yes</option><option value="no">No</option>
+      </select>
+    </label>
 
-    <div class="progress-indicator">
-        <div class="step active" id="step-1">
-            <i class="fas fa-info-circle"></i> Basic Information
-        </div>
-        <!-- <div class="step" id="step-2">
-            <i class="fas fa-money-bill-wave"></i> Budget (Optional)
-        </div> -->
+    <div id="investment_options">
+      <label>Investment Type
+        <select name="investment_type">
+          <option value="mixed">Mixed</option>
+          <option value="stocks">Stocks</option>
+          <option value="bonds">Bonds</option>
+          <option value="mutual_funds">Mutual Funds</option>
+          <option value="real_estate">Real Estate</option>
+        </select>
+      </label>
+
+      <label>Expected Return (%) 
+        <input type="number" name="expected_return" step="0.1" value="0">
+      </label>
     </div>
 
-    <form method="POST" id="assessment-form">
-        <div class="form-section active" id="section-1">
-            <div class="card">
-                <div class="section-title"><i class="fas fa-rupee-sign icon"></i>Income & Savings</div>
+    <label>Monthly Expense Variance (₹)
+      <input type="number" name="monthly_variance" required>
+    </label>
 
-                <div class="form-group">
-                    <label class="required">Monthly Income (in Rupees)</label>
-                    <input type="number" name="monthly_income" required step="0.01" placeholder="e.g. 5000">
-                </div>
+    <label>Loans?
+      <select name="has_loans" id="has_loans" required>
+        <option value="no">No</option><option value="yes">Yes</option>
+      </select>
+    </label>
 
-                <div class="form-group">
-                    <label class="required">Savings Percentage (%)</label>
-                    <input type="number" name="savings_percentage" required min="0" max="100" step="0.1" placeholder="e.g. 20">
-                    <div class="help-text">Aim for at least 20% of your income</div>
-                </div>
+    <div id="loan_fields">
+      <label>Monthly Loan Payment (₹) <input type="number" name="monthly_loan_payment"></label>
+      <label>Outstanding Loan Amount (₹) <input type="number" name="outstanding_loan"></label>
+    </div>
 
-                <div class="form-group">
-                    <label class="required">Is your emergency fund fully provisioned?</label>
-                    <select name="emergency_fund" required>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                    </select>
-                    <div class="help-text">An emergency fund should cover 3-6 months of expenses</div>
-                </div>
-            </div>
+    <div class="form-navigation">
+      <button type="button" onclick="nextSection()">Next <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </fieldset>
 
-            <div class="card">
-            <div class="section-title"><i class="fas fa-globe icon"></i>Region Settings</div>
+  <!-- Section 2 -->
+  <fieldset id="section-2" class="form-section">
+    <legend><i class="fas fa-money-check-alt"></i> Monthly Budget (Optional)</legend>
 
-            <div class="regional-info" id="regional-info">
-                <div class="economic-indicators">
-                    <div><strong>Inflation Rate:</strong> <span id="inflation-rate">5.6%</span></div>
-                    <div><strong>Avg. Income:</strong> <span id="average-income">₹1,74,984</span></div>
-                    <div><strong>Interest Rate:</strong> <span id="interest-rate">6.5%</span></div>
-                </div>
-            </div>
-            </div>
+    <p>Provide a breakdown if you want more detailed analysis.</p>
 
-            <div class="card">
-                <div class="section-title"><i class="fas fa-piggy-bank icon"></i>Investments & Loans</div>
+    <label><i class="fas fa-home"></i> Housing
+      <input type="number" name="housing" value="0">
+    </label>
+    <label><i class="fas fa-car"></i> Transport
+      <input type="number" name="transportation" value="0">
+    </label>
+    <label><i class="fas fa-utensils"></i> Food
+      <input type="number" name="food" value="0">
+    </label>
+    <label><i class="fas fa-lightbulb"></i> Utilities
+      <input type="number" name="utilities" value="0">
+    </label>
+    <label><i class="fas fa-medkit"></i> Healthcare
+      <input type="number" name="healthcare" value="0">
+    </label>
+    <label><i class="fas fa-film"></i> Entertainment
+      <input type="number" name="entertainment" value="0">
+    </label>
+    <label><i class="fas fa-tshirt"></i> Personal
+      <input type="number" name="personal" value="0">
+    </label>
+    <label><i class="fas fa-ellipsis-h"></i> Other
+      <input type="number" name="other" value="0">
+    </label>
 
-                <div class="form-group">
-                    <label class="required">Are your saved funds invested?</label>
-                    <select name="funds_invested" id="funds_invested" onchange="toggleInvestmentFields()" required>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                    </select>
-                </div>
+    <div class="form-navigation">
+      <button type="button" onclick="prevSection()"><i class="fas fa-arrow-left"></i> Back</button>
+      <button type="submit" class="calculate-button"><i class="fas fa-calculator"></i> Calculate</button>
+    </div>
+  </fieldset>
 
-                <div class="form-group" id="investment_type">
-                    <label>Type of Investment</label>
-                    <select name="investment_type">
-                        <!-- <option value="none">None</option> -->
-                        <option value="mixed">Mixed Portfolio</option>
-                        <option value="stocks">Stocks</option>
-                        <option value="bonds">Bonds</option>
-                        <option value="mutual_funds">Mutual Funds</option>
-                        <option value="real_estate">Real Estate</option>
-                    </select>
-                <!-- </div>
+</form>
 
-                <div class="form-group"> -->
-                    <label>Expected Annual Return (%)</label>
-                    <input type="number" name="expected_return" value="0" step="0.1" placeholder="e.g. 7">
-                </div>
+<script>
+function toggleVisibility(selectId, targetId, showValue="yes") {
+  const select = document.getElementById(selectId);
+  const target = document.getElementById(targetId);
+  target.style.display = (select.value === showValue) ? "block" : "none";
+}
 
-                <div class="form-group">
-                    <label class="required">Monthly Variance in Expenditure (in Rupees)</label>
-                    <input type="number" name="monthly_variance" required step="0.01" placeholder="e.g. 300">
-                    <div class="help-text">How much your spending varies month to month</div>
-                </div>
+function nextSection() {
+  document.getElementById('section-1').classList.remove('active');
+  document.getElementById('section-2').classList.add('active');
+  window.scrollTo(0,0);
+}
 
-                <div class="form-group">
-                    <label class="required">Do you have any loans?</label>
-                    <select name="has_loans" id="has_loans" required onchange="toggleLoanFields()">
-                        <option value="no">No</option>
-                        <option value="yes">Yes</option>
-                    </select>
-                </div>
+function prevSection() {
+  document.getElementById('section-2').classList.remove('active');
+  document.getElementById('section-1').classList.add('active');
+  window.scrollTo(0,0);
+}
 
-                <div id="loan-fields" class="loan-fields">
-                    <div class="form-group">
-                        <label>Monthly Loan Payment (in Rupees)</label>
-                        <input type="number" name="monthly_loan_payment" step="0.01" placeholder="e.g. 500">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Outstanding Loan Amount (in Rupees)</label>
-                        <input type="number" name="outstanding_loan" step="0.01" placeholder="e.g. 20000">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-navigation">
-                <!-- <button type="button" onclick="nextSection()">
-                    <i class="fas fa-arrow-right"></i> Next: Budget Breakdown
-                </button> -->
-                <button type="submit" color="green" class="calculate-button secondary">
-                    <i class="fas fa-calculator"></i> Calculate
-                </button>
-            </div>
-        </div>
-
-        <div class="form-section" id="section-2">
-            <div class="card">
-                <div class="section-title"><i class="fas fa-money-check-alt icon"></i>Monthly Budget Breakdown (Optional)</div>
-
-                <p>If you'd like to provide a breakdown of your expenses, fill in the categories below.</p>
-
-                <div class="budget-category">
-                    <label><i class="fas fa-home"></i> Housing</label>
-                    <input type="number" name="housing" step="0.01" value="0" placeholder="Rent/Mortgage">
-                </div>
-
-                <div class="budget-category">
-                    <label><i class="fas fa-car"></i> Transportation</label>
-                    <input type="number" name="transportation" step="0.01" value="0" placeholder="Car/Transit">
-                </div>
-
-                <div class="budget-category">
-                    <label><i class="fas fa-utensils"></i> Food</label>
-                    <input type="number" name="food" step="0.01" value="0" placeholder="Groceries/Dining">
-                </div>
-
-                <div class="budget-category">
-                    <label><i class="fas fa-lightbulb"></i> Utilities</label>
-                    <input type="number" name="utilities" step="0.01" value="0" placeholder="Electric/Water/etc.">
-                </div>
-
-                <div class="budget-category">
-                    <label><i class="fas fa-medkit"></i> Healthcare</label>
-                    <input type="number" name="healthcare" step="0.01" value="0" placeholder="Insurance/Medical">
-                </div>
-
-                <div class="budget-category">
-                    <label><i class="fas fa-film"></i> Entertainment</label>
-                    <input type="number" name="entertainment" step="0.01" value="0" placeholder="Movies/Streaming">
-                </div>
-
-                <div class="budget-category">
-                    <label><i class="fas fa-tshirt"></i> Personal</label>
-                    <input type="number" name="personal" step="0.01" value="0" placeholder="Clothing/Personal Care">
-                </div>
-
-                <div class="budget-category">
-                    <label><i class="fas fa-ellipsis-h"></i> Other</label>
-                    <input type="number" name="other" step="0.01" value="0" placeholder="Miscellaneous">
-                </div>
-            </div>
-
-            <div class="form-navigation">
-                <button type="button" class="secondary" onclick="prevSection()">
-                    <i class="fas fa-arrow-left"></i> Previous
-                </button>
-                <button type="submit" class="calculate-button">
-                    <i class="fas fa-calculator"></i> Calculate Financial Health
-                </button>
-            </div>
-        </div>
-    </form>
-
-    <script>
-        function toggleLoanFields() {
-            var hasLoans = document.getElementById('has_loans').value;
-            var loanFields = document.getElementById('loan-fields');
-
-            if (hasLoans === 'yes') {
-                loanFields.style.display = 'block';
-            } else {
-                loanFields.style.display = 'none';
-            }
-        }
-
-        function toggleInvestmentFields() {
-            var hasInvestment = document.getElementById('funds_invested').value;
-            var investmentType = document.getElementById('investment_type');
-
-            if (hasInvestment === 'yes') {
-                investmentType.style.display = 'block';
-            } else {
-                investmentType.style.display = 'none';
-            }
-        }  
-
-        function nextSection() {
-            // Form validation
-            const requiredFields = document.querySelectorAll('#section-1 [required]');
-            let valid = true;
-
-            requiredFields.forEach(field => {
-                if (!field.value) {
-                    valid = false;
-                    field.style.borderColor = '#ff4444';
-                } else {
-                    field.style.borderColor = '';
-                }
-            });
-
-            if (!valid) {
-                alert('Please fill in all required fields');
-                return;
-            }
-
-            // Validate loan fields if loans are selected
-            if (document.getElementById('has_loans').value === 'yes') {
-                const loanPayment = document.querySelector('input[name="monthly_loan_payment"]');
-                const outstandingLoan = document.querySelector('input[name="outstanding_loan"]');
-
-                if (!loanPayment.value || !outstandingLoan.value) {
-                    valid = false;
-                    if (!loanPayment.value) loanPayment.style.borderColor = '#ff4444';
-                    if (!outstandingLoan.value) outstandingLoan.style.borderColor = '#ff4444';
-                    alert('Please fill in loan details');
-                    return;
-                }
-            }
-
-            // Switch to next section
-            document.getElementById('section-1').classList.remove('active');
-            document.getElementById('section-2').classList.add('active');
-            document.getElementById('step-1').classList.remove('active');
-            document.getElementById('step-2').classList.add('active');
-
-            // Scroll to top
-            window.scrollTo(0, 0);
-        }
-
-        function prevSection() {
-            document.getElementById('section-2').classList.remove('active');
-            document.getElementById('section-1').classList.add('active');
-            document.getElementById('step-2').classList.remove('active');
-            document.getElementById('step-1').classList.add('active');
-            window.scrollTo(0, 0);
-        }
-
-        // Currency conversion logic
-let currentCurrency = {
-    code: 'INR',
-    symbol: '₹',
-    exchangeRate: 1
+// Init
+window.onload = () => {
+  toggleVisibility('has_loans','loan_fields');
+  toggleVisibility('funds_invested','investment_options');
+  document.getElementById('has_loans').onchange=()=>toggleVisibility('has_loans','loan_fields');
+  document.getElementById('funds_invested').onchange=()=>toggleVisibility('funds_invested','investment_options');
 };
+</script>
 
-        // Initialize
-        window.onload = function() {
-            toggleLoanFields();
-            toggleInvestmentFields();
-        };
-    </script>
 </body>
 </html>

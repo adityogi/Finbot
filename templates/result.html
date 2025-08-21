@@ -1,478 +1,160 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Financial Health Results</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --primary: #4CAF50;
-            --primary-dark: #388E3C;
-            --primary-light: #C8E6C9;
-            --accent: #FF9800;
-            --danger: #F44336;
-            --light-grey: #f5f5f5;
-            --border-radius: 8px;
-            --box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        h1, h2 {
-            color: var(--primary-dark);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .score-display {
-            font-size: 48px;
-            font-weight: bold;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .score-display.good { color: var(--primary); }
-        .score-display.average { color: var(--accent); }
-        .score-display.poor { color: var(--danger); }
-
-        .chart-container {
-            width: 100%;
-            height: 300px;
-            margin-bottom: 20px;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .metric-box {
-            background-color: var(--light-grey);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            text-align: center;
-        }
-
-        .metric-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-            color: #333;
-        }
-
-        .metric-value.good { color: var(--primary); }
-        .metric-value.average { color: var(--accent); }
-        .metric-value.poor { color: var(--danger); }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .action-button {
-            padding: 12px 20px;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: var(--border-radius);
-            display: inline-flex;
-            align-items: center;
-            font-weight: 500;
-        }
-
-        .action-button i {
-            margin-right: 8px;
-        }
-
-        .nav-links {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .nav-link {
-            padding: 10px 20px;
-            margin: 0 10px;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: var(--border-radius);
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            margin-right: 5px;
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
-        }
-
-        .tab.active {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .recommendation {
-            display: flex;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .recommendation i {
-            color: var(--primary);
-            font-size: 24px;
-            margin-right: 15px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Financial Health Results</title>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="../static/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="nav-links">
-        <a href="/" class="nav-link">New Assessment</a>
-        <a href="/history" class="nav-link">History</a>
-    </div>
 
-    <h1><i class="fas fa-chart-line"></i> Financial Health Results</h1>
+<header>
+  <nav class="nav-links">
+    <a href="/" class="nav-link">New Assessment</a>
+    <a href="/history" class="nav-link">History</a>
+  </nav>
+  <h1><i class="fas fa-chart-line"></i> Financial Health Results</h1>
+</header>
 
-    <div class="tabs">
-        <div class="tab active" data-tab="summary">Summary</div>
-        <div class="tab" data-tab="charts">Charts</div>
-        <div class="tab" data-tab="recommendations">Recommendations</div>
-    </div>
+<main>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="summary">Summary</button>
+    <button class="tab" data-tab="charts">Charts</button>
+    <button class="tab" data-tab="recommendations">Recommendations</button>
+  </div>
 
-    <div class="tab-content active" id="summary-tab">
-        <div class="card">
-            <h2>Your Financial Health Score</h2>
-            <div class="score-display {% if analysis.score >= 7 %}good{% elif analysis.score >= 5 %}average{% else %}poor{% endif %}">
-                {{ analysis.score }} / 10
-            </div>
-            <p style="text-align: center;">
-                {% if analysis.score >= 7 %}
-                    Your financial health is in good condition!
-                {% elif analysis.score >= 5 %}
-                    Your financial health is average. Some improvements needed.
-                {% else %}
-                    Your financial health needs attention.
-                {% endif %}
-            </p>
+  <!-- Summary -->
+  <section class="tab-content active" id="summary-tab">
+    <article class="card">
+      <h2>Your Score</h2>
+      <div class="score-display 
+        {% if analysis.score >= 7 %}good{% elif analysis.score >= 5 %}average{% else %}poor{% endif %}">
+        {{ analysis.score }}/10
+      </div>
+      <p class="center">
+        {% if analysis.score >= 7 %} Great job — your financial health is strong!
+        {% elif analysis.score >= 5 %} Average. Improve savings & balance loans.
+        {% else %} Needs attention. Focus on building strong foundations.
+        {% endif %}
+      </p>
+    </article>
+
+    <article class="card">
+      <h2>Key Metrics</h2>
+      <div class="metrics-grid">
+        <div class="metric"><span>Income</span>
+          <span class="metric-value">{{ analysis.currency.symbol }}{{ "%.0f"|format(analysis.monthly_income) }}</span>
         </div>
 
-        <div class="card">
-            <h2>Key Metrics</h2>
-            <div class="metrics-grid">
-                <div class="metric-box">
-                    <div>Monthly Income</div>
-                    <div class="metric-value {% if analysis.monthly_income <= 5000 %}poor{% elif analysis.monthly_income <= 12000 %}average{% else %}good{% endif %}">₹{{ "%.0f"|format(analysis.monthly_income) }}</div>
-                </div>
-
-                <div class="metric-box">
-                    <div>Savings Rate</div>
-                    <div class="metric-value {% if analysis.savings_percentage <= 0.2 %}poor{% elif analysis.savings_percentage <= 0.3 %}average{% else %}good{% endif %}">
-                        {% if analysis.monthly_variance >0 %}
-                            {{ "%.1f"|format(analysis.lowest_savings_percentage) }}% -  
-                        {% endif %}
-                        {{ "%.1f"|format(analysis.savings_percentage) }}%
-                    </div>
-                </div>
-
-                <div class="metric-box">
-                    <div>Monthly Savings</div>
-                    <div class="metric-value">
-                        {% if analysis.monthly_variance >0 %}
-                            ₹{{ "%.0f - "|format(analysis.monthly_savings - analysis.monthly_variance) }} 
-                        {% endif %}
-                        ₹{{ "%.0f"|format(analysis.monthly_savings) }}
-                    </div>
-                </div>
-
-                <div class="metric-box">
-                    <div>Monthly Expenses</div>
-                    <div class="metric-value">
-                        ₹{{ "%.0f"|format(analysis.monthly_expenditure) }}
-                        {% if analysis.monthly_variance >0 %}
-                            {{ " - ₹%.0f"|format(analysis.monthly_expenditure + analysis.monthly_variance) }} 
-                        {% endif %}
-                    </div>
-                </div>
-
-                {% if analysis.monthly_loan_payment is defined %}
-                <div class="metric-box">
-                    <div>Loan Payment</div>
-                    <div class="metric-value">₹{{ "%.0f"|format(analysis.monthly_loan_payment) }}</div>
-                </div>
-
-                <div class="metric-box">
-                    <div>Loan/Income Ratio</div>
-                    <div class="metric-value {% if analysis.loan_to_income_ratio >= 0.5 %}poor{% elif analysis.loan_to_income_ratio >= 0.3 %}average{% else %}good{% endif %}">{{ "%.1f"|format(analysis.loan_to_income_ratio) }}%</div>
-                </div>
-                {% endif %}
-            </div>
+        <div class="metric"><span>Savings Rate</span>
+          <span class="metric-value">{{ "%.1f"|format(analysis.savings_percentage) }}%</span>
         </div>
-    </div>
 
-    <div class="tab-content" id="charts-tab">
-        <div class="card">
-            <h2>Income Allocation</h2>
-            <div class="chart-container">
-                <canvas id="incomeAllocationChart"></canvas>
-            </div>
+        <div class="metric"><span>Monthly Savings</span>
+          <span class="metric-value">{{ analysis.currency.symbol }}{{ "%.0f"|format(analysis.monthly_savings) }}</span>
         </div>
-    </div>
 
-    <div class="tab-content" id="recommendations-tab">
-        <div class="card">
-            <h2>Personalized Financial Recommendations</h2>
-
-            <div class="regional-context">
-                <h3>Economic Context for {{ country_data.name }}</h3>
-                <p>Current inflation rate is {{ country_data.economic_data.inflation_rate }}%, which means your savings need to grow by at least this rate to maintain purchasing power.</p>
-                <p>Average income in {{ country_data.name }} is {{ analysis.currency.symbol }}{{ country_data.economic_data.average_income }}. Your income is {{ "above" if analysis.monthly_income * 12 > country_data.economic_data.average_income else "below" }} the national average.</p>
-            </div>
-
-            <h3>Priority Actions</h3>
-
-            {% set recommendations = [] %}
-
-            {% if analysis.emergency_fund == "no" %}
-                {% set _ = recommendations.append({
-                    'priority': 'High',
-                    'icon': 'shield-alt',
-                    'title': 'Build Emergency Fund',
-                    'description': 'In ' + country_data.name + ', experts recommend keeping ' + country_data.financial_targets.emergency_fund_months|string + ' months of expenses in an easily accessible emergency fund.',
-                    'action': 'Set aside a small amount each month specifically for emergencies until you reach ' + (analysis.monthly_expenditure * country_data.financial_targets.emergency_fund_months)|int|string + ' ' + analysis.currency.code + '.'
-                }) %}
-            {% endif %}
-
-            {% if analysis.savings_percentage < country_data.financial_targets.recommended_savings_rate %}
-                {% set _ = recommendations.append({
-                    'priority': 'High',
-                    'icon': 'piggy-bank',
-                    'title': 'Increase Savings Rate',
-                    'description': 'Your current savings rate (' + analysis.savings_percentage|string + '%) is below the recommended ' + country_data.financial_targets.recommended_savings_rate|string + '% for ' + country_data.name + '.',
-                    'action': 'Identify areas to reduce spending. Consider automating savings to reach at least ' + (analysis.monthly_income * country_data.financial_targets.recommended_savings_rate / 100)|int|string + ' ' + analysis.currency.code + ' per month.'
-                }) %}
-            {% endif %}
-
-            {% if analysis.has_loans == "yes" and analysis.loan_to_income_ratio > country_data.financial_targets.max_loan_to_income %}
-                {% set _ = recommendations.append({
-                    'priority': 'High',
-                    'icon': 'hand-holding-usd',
-                    'title': 'Reduce Debt Burden',
-                    'description': 'Your loan-to-income ratio (' + analysis.loan_to_income_ratio|round(1)|string + '%) exceeds the recommended maximum of ' + country_data.financial_targets.max_loan_to_income|string + '% for ' + country_data.name + '.',
-                    'action': 'Consider debt consolidation or refinancing. Focus on paying off high-interest debt first while maintaining minimum payments on other debts.'
-                }) %}
-            {% endif %}
-
-            {% if analysis.funds_invested == "no" and analysis.monthly_savings > 0 %}
-                {% set _ = recommendations.append({
-                    'priority': 'Medium',
-                    'icon': 'chart-line',
-                    'title': 'Start Investing',
-                    'description': 'With inflation at ' + country_data.economic_data.inflation_rate|string + '% in ' + country_data.name + ', your uninvested savings are losing purchasing power.',
-                    'action': 'Consider investing in low-cost index funds or speaking with a financial advisor about options suitable for your risk tolerance.'
-                }) %}
-            {% endif %}
-
-            {% if analysis.variance_percentage > 20 %}
-                {% set _ = recommendations.append({
-                    'priority': 'Medium',
-                    'icon': 'balance-scale',
-                    'title': 'Stabilize Monthly Spending',
-                    'description': 'Your spending varies significantly month-to-month (' + analysis.variance_percentage|round(1)|string + '% variance).',
-                    'action': 'Create a detailed budget for essential expenses. Consider using the envelope method or a budgeting app to track spending in real-time.'
-                }) %}
-            {% endif %}
-
-            {% if analysis.investment_type == "none" and analysis.funds_invested == "yes" %}
-                {% set _ = recommendations.append({
-                    'priority': 'Low',
-                    'icon': 'coins',
-                    'title': 'Diversify Investments',
-                    'description': 'You\'ve indicated you\'re investing but haven\'t specified an investment type.',
-                    'action': 'Consider a diversified portfolio appropriate for your age and risk tolerance. The current interest rate in ' + country_data.name + ' is ' + country_data.economic_data.interest_rate|string + '%.'
-                }) %}
-            {% endif %}
-
-            <!-- Display recommendations by priority -->
-            {% for priority in ['High', 'Medium', 'Low'] %}
-                {% set priority_recommendations = recommendations|selectattr('priority', 'equalto', priority)|list %}
-                {% if priority_recommendations %}
-                    <div class="priority-section priority-{{ priority|lower }}">
-                        <h4>{{ priority }} Priority</h4>
-
-                        {% for rec in priority_recommendations %}
-                            <div class="recommendation">
-                                <i class="fas fa-{{ rec.icon }}"></i>
-                                <div>
-                                    <strong>{{ rec.title }}</strong>
-                                    <p>{{ rec.description }}</p>
-                                    <div class="action-step"><strong>Action:</strong> {{ rec.action }}</div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            {% endfor %}
-
-            {% if not recommendations %}
-                <div class="recommendation">
-                    <i class="fas fa-thumbs-up"></i>
-                    <div>
-                        <strong>You're on the Right Track!</strong>
-                        <p>Your financial health appears to be good! Continue maintaining your current financial habits.</p>
-                        <div class="action-step"><strong>Action:</strong> Consider setting more ambitious financial goals or increasing your investments.</div>
-                    </div>
-                </div>
-            {% endif %}
-
-            <!-- <div class="resources-section">
-                <h3>Helpful Resources</h3>
-                <ul>
-                    <li><a href="#"><i class="fas fa-book"></i> Guide to Emergency Funds</a></li>
-                    <li><a href="#"><i class="fas fa-university"></i> Debt Management Strategies</a></li>
-                    <li><a href="#"><i class="fas fa-calculator"></i> Investment Calculator</a></li>
-                    <li><a href="#"><i class="fas fa-file-invoice"></i> Budgeting Templates</a></li>
-                </ul>
-            </div> -->
+        <div class="metric"><span>Monthly Expenses</span>
+          <span class="metric-value">{{ analysis.currency.symbol }}{{ "%.0f"|format(analysis.monthly_expenditure) }}</span>
         </div>
-    </div>
 
-    <div class="actions">
-        <!-- <a href="/export/pdf/{{ analysis.id }}" class="action-button">
-            <i class="fas fa-file-pdf"></i> Download as PDF
-        </a> -->
-        <!-- <a href="/export/excel/{{ analysis.id }}" class="action-button">
-            <i class="fas fa-file-excel"></i> Download as Excel
-        </a> -->
-        <a href="/export/csv/{{ analysis.id }}" class="action-button">
-            <i class="fas fa-file-csv"></i> Download as CSV
-        </a>
-        <a href="/" class="action-button">
-            <i class="fas fa-redo"></i> Start New Assessment
-        </a>
-    </div>
+        {% if analysis.monthly_loan_payment %}
+        <div class="metric"><span>Loan Payment</span>
+          <span class="metric-value">{{ analysis.currency.symbol }}{{ "%.0f"|format(analysis.monthly_loan_payment) }}</span>
+        </div>
+        <div class="metric"><span>Loan/Income</span>
+          <span class="metric-value">{{ "%.1f"|format(analysis.loan_to_income_ratio) }}%</span>
+        </div>
+        {% endif %}
+      </div>
+    </article>
+  </section>
 
-    <script>
-        // Tab switching functionality
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
+  <!-- Charts -->
+  <section class="tab-content" id="charts-tab">
+    <article class="card">
+      <h2>Income Allocation</h2>
+      <canvas id="incomeChart"></canvas>
+    </article>
+    <article class="card">
+      <h2>Financial Health Factors</h2>
+      <canvas id="radarChart"></canvas>
+    </article>
+  </section>
 
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                document.getElementById(this.dataset.tab + '-tab').classList.add('active');
-            });
-        });
+  <!-- Recommendations -->
+  <section class="tab-content" id="recommendations-tab">
+    <article class="card">
+      <h2>Recommendations</h2>
+      {% if recommendations %}
+        {% for priority in ['High','Medium','Low'] %}
+          {% set recs = recommendations|selectattr('priority','equalto',priority)|list %}
+          {% if recs %}
+            <h3>{{ priority }} Priority</h3>
+            <ul>
+              {% for r in recs %}
+              <li>
+                <i class="fas fa-{{ r.icon }}"></i>
+                <strong>{{ r.title }}</strong>
+                <p>{{ r.description }}</p>
+                <small><b>Action:</b> {{ r.action }}</small>
+              </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <p><i class="fas fa-thumbs-up"></i> You're on track! Keep up good habits.</p>
+      {% endif %}
+    </article>
+  </section>
 
-        // Charts
-        const incomeAllocationChart = new Chart(
-            document.getElementById('incomeAllocationChart'),
-            {
-                type: 'pie',
-                data: {
-                    labels: ['Loan', 'Savings', 'Variance', 'Expenses'],
-                    datasets: [{
-                        data: [{{ analysis.monthly_loan_payment }}, 
-                        {{ analysis.monthly_savings - analysis.monthly_variance }}, 
-                        {{ analysis.monthly_variance}}, 
-                        {{ analysis.monthly_expenditure }}],
-                        backgroundColor: ['darkgrey', 'green', 'lightblue', 'coral'],
-                        borderColor: [
-                            'blue',  // Darker border for the shaded slice
-                            'transparent',
-                            'white',  // Darker border for the shaded slice
-                            'transparent'
-                        ],
-                        borderWidth: [
-                            1,
-                            0,
-                            2,  // Thicker border on the first slice (Loan)
-                            0
-                        ],
-                        // Optional: To "pull out" the shaded slice for emphasis
-                        offset: [
-                            0,
-                            0,
-                            2,  // Moves 'Loan' slice out by 10px
-                            0
-                        ],
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                },
-            },
-        );
+  <!-- Actions -->
+  <div class="actions">
+    <a class="action-button" href="/export/csv/{{ analysis.id }}"><i class="fas fa-file-csv"></i> CSV</a>
+    <a class="action-button" href="/"><i class="fas fa-redo"></i> New Assessment</a>
+  </div>
+</main>
 
-        const financialHealthChart = new Chart(
-            document.getElementById('financialHealthChart'),
-            {
-                type: 'radar',
-                data: {
-                    labels: ['Emergency Fund', 'Investments', 'Debt Management', 'Savings Rate', 'Expense Control'],
-                    datasets: [{
-                        label: 'Your Score',
-                        data: [
-                            {{ 10 if analysis.emergency_fund == "yes" else 5 }},
-                            {{ 10 if analysis.funds_invested == "yes" else 5 }},
-                            {{ 10 if analysis.has_loans == "no" else (7 if analysis.loan_to_income_ratio < 30 else 4) }},
-                            {{ 10 if analysis.savings_percentage >= 20 else (7 if analysis.savings_percentage >= 10 else 4) }},
-                            {{ 10 if analysis.variance_percentage < 10 else (7 if analysis.variance_percentage < 20 else 4) }}
-                        ],
-                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                        borderColor: '#4CAF50'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            }
-        );
-    </script>
+<script>
+// Tab Switching
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll('.tab,.tab-content').forEach(el=>el.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab+'-tab').classList.add('active');
+  };
+});
+
+// Charts
+new Chart(document.getElementById('incomeChart'), {
+  type:'pie',
+  data:{labels:['Loan','Savings','Variance','Expenses'],
+        datasets:[{data:[
+          {{ analysis.monthly_loan_payment or 0 }},
+          {{ analysis.monthly_savings - analysis.monthly_variance }},
+          {{ analysis.monthly_variance }},
+          {{ analysis.monthly_expenditure }}],
+        backgroundColor:['#888','#4caf50','#03a9f4','#ff5722']}]}
+});
+
+new Chart(document.getElementById('radarChart'), {
+  type:'radar',
+  data:{labels:['Emergency Fund','Investments','Debt','Savings','Expenses'],
+        datasets:[{label:'Your Score',
+        data:[
+          {{ 10 if analysis.emergency_fund=="yes" else 5 }},
+          {{ 10 if analysis.funds_invested=="yes" else 5 }},
+          {{ 10 if analysis.has_loans=="no" else (7 if analysis.loan_to_income_ratio < 30 else 4) }},
+          {{ 10 if analysis.savings_percentage>=20 else (7 if analysis.savings_percentage>=10 else 4) }},
+          {{ 10 if analysis.variance_percentage<10 else (7 if analysis.variance_percentage<20 else 4) }}
+        ],
+        backgroundColor:'rgba(76,175,80,0.2)',borderColor:'#4caf50'}]}
+});
+</script>
+
 </body>
 </html>
