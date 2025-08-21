@@ -83,18 +83,6 @@ def compute_financial_metrics(form_data):
         "variance_percentage": variance_pct,
     }
 
-
-def sort_assessments(assessments, sort_by):
-    if sort_by == 'date-asc':
-        return sorted(assessments, key=lambda x: x['date'])
-    elif sort_by == 'score-high':
-        return sorted(assessments, key=lambda x: x['score'], reverse=True)
-    elif sort_by == 'score-low':
-        return sorted(assessments, key=lambda x: x['score'])
-    # default: date-desc
-    return sorted(assessments, key=lambda x: x['date'], reverse=True)
-
-
 # ---------- Routes ----------
 @app.route('/', methods=['GET', 'POST'])
 def financial_health():
@@ -153,7 +141,7 @@ def history():
         a['region_name'] = country_data['name'] if country_data else 'India'
         a.setdefault('currency', {'symbol': '₹', 'code': 'INR', 'exchange_rate': 1})
 
-    assessments = sort_assessments(assessments, request.args.get('sort', 'date-desc'))
+    assessments = sorted(assessments, key=lambda x: x['date'], reverse=True)
 
     # Group by month-year
     assessments_by_month = {}
@@ -219,25 +207,22 @@ def export_history():
     return send_file(filename, as_attachment=True, download_name=filename,
                      mimetype='text/csv')
 
-@app.route('/export/<format>/<int:assessment_id>')
-def export_report(format, assessment_id):
-    print(f"Exporting {format} report for assessment {assessment_id}")
-
-    if format == 'csv':
-        csv_filename = generate_excel(assessment_id, "csv")
-        if csv_filename and os.path.exists(csv_filename):
-            return send_file(
-                csv_filename,
-                as_attachment=True,
-                download_name=f"financial_report_{assessment_id}.csv",
-                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
+@app.route('/export/csv/<int:assessment_id>')
+def export_report(assessment_id):
+    print(f"Exporting report for assessment {assessment_id}")
+    filename = generate_csv(assessment_id)
+    if filename and os.path.exists(filename):
+        return send_file(
+            filename,
+            as_attachment=True,
+            download_name=f"financial_report_{assessment_id}.csv",
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
 
     return redirect(url_for('view_assessment', assessment_id=assessment_id))
 
-
-# Generate Excel report
-def generate_excel(assessment_id, format="xlsx"):
+# Generate CSV report
+def generate_csv(assessment_id):
     assessment = db.get_assessment_details(assessment_id)
     if not assessment:
         return None
@@ -271,10 +256,7 @@ def generate_excel(assessment_id, format="xlsx"):
     }
 
     df = pd.DataFrame(data)
+    filename = f"financial_report_{assessment_id}.csv"
+    df.to_csv(filename, index=False)
 
-    if format == "csv":
-        # Save to CSV
-        csv_filename = f"financial_report_{assessment_id}.csv"
-        df.to_csv(csv_filename, index=False)
-
-        return csv_filename
+    return filename

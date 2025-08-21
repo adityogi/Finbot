@@ -216,43 +216,6 @@
         });
         {% endif %}
 
-        // Filtering functionality
-        function filterHistory() {
-            const yearFilter = document.getElementById('year-filter').value;
-            const sortBy = document.getElementById('sort-by').value;
-
-            // Filter by year
-            const monthSections = document.querySelectorAll('.month-section');
-            monthSections.forEach(section => {
-                if (yearFilter === 'all' || section.dataset.year === yearFilter) {
-                    section.style.display = 'block';
-                } else {
-                    section.style.display = 'none';
-                }
-            });
-
-            // Sort functionality would require reload or DOM manipulation
-            // For simplicity, we'll just submit the form with the filters
-            const form = document.createElement('form');
-            form.method = 'GET';
-            form.action = '/history';
-
-            const yearInput = document.createElement('input');
-            yearInput.type = 'hidden';
-            yearInput.name = 'year';
-            yearInput.value = yearFilter;
-            form.appendChild(yearInput);
-
-            const sortInput = document.createElement('input');
-            sortInput.type = 'hidden';
-            sortInput.name = 'sort';
-            sortInput.value = sortBy;
-            form.appendChild(sortInput);
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-
         function exportHistory() {
             window.location.href = '/export/history';
         }
