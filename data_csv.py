@@ -146,18 +146,17 @@ def get_assessment_details(assessment_id):
     if not assessment:
         return None
 
-    monthly_savings = assessment["savings_percentage"] * assessment["monthly_income"] / 100
-    assessment["monthly_savings"] = monthly_savings
-    assessment["monthly_expenditure"] = assessment["monthly_income"] - monthly_savings
+    income = assessment["monthly_income"]
+    savings = assessment["savings_percentage"] * income / 100
+    assessment["monthly_savings"] = savings
+    assessment["monthly_expenditure"] = income - savings
     variance = assessment["monthly_variance"]
     if assessment["monthly_variance"] < 0:
         variance = 0
-    assessment['lowest_savings_percentage'] = 100 * (monthly_savings - variance) / assessment["monthly_income"]
+    assessment["lowest_savings_percentage"] = 100 * (savings - variance) / income
+    assessment["loan_to_income_ratio"] = (assessment["monthly_loan_payment"] / income) * 100
+    assessment["variance_percentage"] = (variance / assessment["monthly_expenditure"]) * 100
 
-    assessment["loan_to_income_ratio"] = (assessment['monthly_loan_payment'] / assessment["monthly_income"]) * 100
-    assessment["variance_percentage"] = (assessment['monthly_variance'] / assessment["monthly_expenditure"]) * 100
-
-    print(f"Assessment: {assessment}")
     return assessment
 
 # ---------- RUN INIT ----------

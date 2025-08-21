@@ -209,14 +209,12 @@ def export_history():
 
 @app.route('/export/csv/<int:assessment_id>')
 def export_report(assessment_id):
-    print(f"Exporting report for assessment {assessment_id}")
     filename = generate_csv(assessment_id)
     if filename and os.path.exists(filename):
         return send_file(
             filename,
             as_attachment=True,
-            download_name=f"financial_report_{assessment_id}.csv",
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            download_name=f"financial_report_{assessment_id}.csv"
         )
 
     return redirect(url_for('view_assessment', assessment_id=assessment_id))
@@ -227,20 +225,20 @@ def generate_csv(assessment_id):
     if not assessment:
         return None
 
-    # Create DataFrame for assessment data
-    monthly_savings = assessment['monthly_income'] * (assessment['savings_percentage'] / 100)
-    monthly_expenditure = assessment['monthly_income'] - monthly_savings
+    income = assessment['monthly_income']
+    monthly_savings = income * (assessment['savings_percentage'] / 100)
+    monthly_expenditure = income - monthly_savings
 
     data = {
         'Metric': [
             'Date', 'Monthly Income', 'Savings Percentage', 'Monthly Savings',
-            'Monthly Expenditure', 'Emergency Fund', 'Investments', 'Investment Type',
-            'Expected Return', 'Has Loans', 'Monthly Loan Payment', 'Outstanding Loan',
-            'Financial Health Score'
+            'Monthly Expenditure', 'Emergency Fund', 'Investments', 
+            'Investment Type','Expected Return', 'Has Loans', 
+            'Monthly Loan Payment', 'Outstanding Loan', 'Financial Health Score'
         ],
         'Value': [
             assessment['date'],
-            f"₹{assessment['monthly_income']}",
+            f"₹{income}",
             f"{assessment['savings_percentage']}%",
             f"₹{monthly_savings}",
             f"₹{monthly_expenditure}",
