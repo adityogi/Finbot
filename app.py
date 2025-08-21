@@ -9,7 +9,7 @@ print (f"flask app name is {__name__}")
 app = Flask(__name__,
             template_folder='templates',  # This should be the path to your templates
             static_folder='static')       # This should be the path to your static files
-# app.secret_key = 'financial_health_secret_key'  # Required for session
+app.secret_key = 'financial_health_secret_key'  # Required for session
 
 defaults = {
     "region_code": 'IN',
