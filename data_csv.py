@@ -1,6 +1,5 @@
 import csv
 import os
-import json
 from datetime import datetime
 from schema import TABLE_SCHEMAS
 
@@ -116,20 +115,32 @@ def save_assessment(user_id, data, score):
     return assessment_id
 
 # ---------- REGION DATA ----------
-def load_region_data():
-    try:
-        with open('regions.json', 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        print("Error loading region data. Ensure 'regions.json' exists and is valid.")
-        return None
 
 def get_country_data(country_code):
-    regions = load_region_data()
-    for c in regions.get("countries", []):
-        if c.get("code") == country_code:
-            return c
-    # default
+    regions = { 
+        "countries": [
+            {
+                "name": "India",
+                "code": "IN",
+                "currency": {
+                    "code": "INR",
+                    "symbol": "₹",
+                    "exchange_rate": 83.2
+                },
+                "economic_data": {
+                    "inflation_rate": 5.6,
+                    "average_income": 174984,
+                    "interest_rate": 6.5,
+                    "unemployment_rate": 7.1
+                },
+                "financial_targets": {
+                    "emergency_fund_months": 8,
+                    "recommended_savings_rate": 30,
+                    "max_loan_to_income": 40
+                }
+            }
+        ] 
+        }
     for c in regions.get("countries", []):
         if c.get("code") == "IN":
             return c

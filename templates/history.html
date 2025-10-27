@@ -73,7 +73,7 @@
         .poor { color: var(--danger); }
 
         /* Buttons & Links */
-        .view-link, .nav-link, .export-button {
+        .view-link, .nav-link {
           display: inline-block;
           padding: 8px 15px;
           background: var(--primary);
@@ -127,10 +127,6 @@
 
     {% if assessments %}
     <div class="card">
-        <button class="export-button" onclick="exportHistory()">
-            <i class="fas fa-file-export"></i> Export History
-        </button>
-
         <div class="chart-container">
             <canvas id="historyChart"></canvas>
         </div>
@@ -215,10 +211,6 @@
             }
         });
         {% endif %}
-
-        function exportHistory() {
-            window.location.href = '/export/history';
-        }
     </script>
 </body>
 </html>

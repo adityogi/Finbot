@@ -358,26 +358,10 @@
                     </div>
                 </div>
             {% endif %}
-
-            <!-- <div class="resources-section">
-                <h3>Helpful Resources</h3>
-                <ul>
-                    <li><a href="#"><i class="fas fa-book"></i> Guide to Emergency Funds</a></li>
-                    <li><a href="#"><i class="fas fa-university"></i> Debt Management Strategies</a></li>
-                    <li><a href="#"><i class="fas fa-calculator"></i> Investment Calculator</a></li>
-                    <li><a href="#"><i class="fas fa-file-invoice"></i> Budgeting Templates</a></li>
-                </ul>
-            </div> -->
         </div>
     </div>
 
     <div class="actions">
-        <!-- <a href="/export/pdf/{{ analysis.id }}" class="action-button">
-            <i class="fas fa-file-pdf"></i> Download as PDF
-        </a> -->
-        <!-- <a href="/export/excel/{{ analysis.id }}" class="action-button">
-            <i class="fas fa-file-excel"></i> Download as Excel
-        </a> -->
         <a href="/export/csv/{{ analysis.id }}" class="action-button">
             <i class="fas fa-file-csv"></i> Download as CSV
         </a>
@@ -424,12 +408,7 @@
                             0
                         ],
                         // Optional: To "pull out" the shaded slice for emphasis
-                        offset: [
-                            0,
-                            0,
-                            2,  // Moves 'Loan' slice out by 10px
-                            0
-                        ],
+                        offset: [0, 0, 2, 0], // Moves 'Loan' slice out by 10px
                     }],
                 },
                 options: {

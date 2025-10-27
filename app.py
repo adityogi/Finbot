@@ -161,7 +161,6 @@ def history():
         assessment_years=assessment_years,
         assessment_dates=assessment_dates,
         assessment_scores=assessment_scores,
-        # goals=goals
     )
 
 @app.route('/assessment/<int:assessment_id>')
@@ -174,38 +173,6 @@ def view_assessment(assessment_id):
     assessment['currency'] = country_data["currency"]
 
     return render_template('result.html', analysis=assessment, country_data=country_data)
-
-@app.route('/export/history')
-def export_history():
-    username = session.get('username')
-    if not username:
-        return redirect(url_for('financial_health'))
-
-    user_id = db.get_or_create_user(username)
-    assessments = db.get_user_assessments(user_id)
-
-    export_data = []
-    for a in assessments:
-        date = a['date']
-        if isinstance(date, str):
-            date = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-
-        export_data.append({
-            'Date': date.strftime('%Y-%m-%d'),
-            'Score': a['score'],
-            'Monthly Income': a['monthly_income'],
-            'Savings %': a['savings_percentage'],
-            'Region': a.get('region_code', 'IN'),
-            'Emergency Fund': a['emergency_fund'],
-            'Invested': a['funds_invested']
-        })
-
-    df = pd.DataFrame(export_data)
-    filename = f"financial_history_{username}.csv"
-    df.to_csv(filename, index=False)
-
-    return send_file(filename, as_attachment=True, download_name=filename,
-                     mimetype='text/csv')
 
 @app.route('/export/csv/<int:assessment_id>')
 def export_report(assessment_id):
