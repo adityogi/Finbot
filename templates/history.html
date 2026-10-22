@@ -127,6 +127,9 @@
 
     {% if assessments %}
     <div class="card">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+            <a href="/export/history" class="view-link"><i class="fas fa-file-csv"></i> Export Full History (CSV)</a>
+        </div>
         <div class="chart-container">
             <canvas id="historyChart"></canvas>
         </div>

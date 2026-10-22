@@ -5,10 +5,15 @@ import data_csv as db
 import uuid
 from datetime import datetime
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Flask App Configuration
-app = Flask(__name__, template_folder='templates', static_folder='static')
-app.secret_key = 'financial_health_secret_key'
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, 'templates'),
+    static_folder=os.path.join(BASE_DIR, 'static')
+)
+app.secret_key = os.environ.get('SECRET_KEY', 'financial_health_secret_key')
 
 # Defaults
 DEFAULTS = {
@@ -20,59 +25,68 @@ DEFAULTS = {
 
 # ---------- Helper Functions ----------
 def calculate_score(analysis, country_data):
-    targets = country_data.get('financial_targets', {})
+    targets = country_data.get('financial_targets', {}) if country_data else {}
     target_savings = targets.get('recommended_savings_rate', DEFAULTS["savings_rate"])
     max_loan_income = targets.get('max_loan_to_income', DEFAULTS["max_loan_to_income"])
 
-    econ_data = country_data["economic_data"]
-    monthly_avg_income = econ_data["average_income"] / 12
+    econ_data = country_data.get("economic_data", {}) if country_data else {}
+    avg_income = econ_data.get("average_income", 174984)
+    monthly_avg_income = avg_income / 12
 
     score = 10
 
     # Income score
-    income = analysis['monthly_income']
+    income = analysis.get('monthly_income', 0)
     if income < monthly_avg_income * 0.3: score -= 3
     elif income < monthly_avg_income * 0.5: score -= 2
     elif income < monthly_avg_income * 0.75: score -= 1
     elif income > monthly_avg_income: score += 1
 
     # Emergency fund
-    if analysis['emergency_fund'] == 'no':
+    if analysis.get('emergency_fund') == 'no':
         score -= 2
 
     # Investments
-    if analysis['funds_invested'] == 'no':
+    if analysis.get('funds_invested') == 'no':
         score -= 1.5
 
     # Loan risks
-    if analysis["loan_to_income_ratio"] > max_loan_income: score -= 2
-    elif analysis["loan_to_income_ratio"] > max_loan_income * 0.75: score -= 1
-    if analysis["loan_to_savings_ratio"] > 60: score -= 2
-    elif analysis["loan_to_savings_ratio"] > 40: score -= 1
+    loan_to_income = analysis.get("loan_to_income_ratio", 0)
+    if loan_to_income > max_loan_income: score -= 2
+    elif loan_to_income > max_loan_income * 0.75: score -= 1
+
+    loan_to_savings = analysis.get("loan_to_savings_ratio", 0)
+    if loan_to_savings > 60: score -= 2
+    elif loan_to_savings > 40: score -= 1
 
     # Expenditure variance
-    if analysis["variance_percentage"] > 40: score -= 2
-    elif analysis["variance_percentage"] > 20: score -= 1
+    variance_pct = analysis.get("variance_percentage", 0)
+    if variance_pct > 40: score -= 2
+    elif variance_pct > 20: score -= 1
 
     # Savings %
-    if analysis["savings_percentage"] < target_savings * 0.75: score -= 1
-    elif analysis["savings_percentage"] < target_savings: score -= 2
+    savings_pct = analysis.get("savings_percentage", 0)
+    if savings_pct < target_savings * 0.75: score -= 1
+    elif savings_pct < target_savings: score -= 2
 
     return max(0, min(10, round(score, 1)))
 
 
 def compute_financial_metrics(form_data):
-    income = form_data['monthly_income']
-    savings_pct = form_data['savings_percentage']
+    income = form_data.get('monthly_income', 0.0)
+    savings_pct = form_data.get('savings_percentage', 0.0)
 
     monthly_savings = income * (savings_pct / 100)
     monthly_expenditure = income - monthly_savings
-    lowest_savings_pct = ((monthly_savings - form_data['monthly_variance']) * 100 / income)
+    monthly_variance = form_data.get('monthly_variance', 0.0)
+    lowest_savings_pct = ((monthly_savings - monthly_variance) * 100 / income) if income > 0 else 0.0
 
     # Ratios
-    loan_to_income = (form_data['monthly_loan_payment'] / income * 100) if form_data['monthly_loan_payment'] else 0
-    loan_to_savings = (form_data['outstanding_loan'] / monthly_savings) if monthly_savings and form_data['outstanding_loan'] else 0
-    variance_pct = (form_data['monthly_variance'] / monthly_expenditure * 100) if monthly_expenditure else 0
+    loan_payment = form_data.get('monthly_loan_payment', 0.0)
+    loan_to_income = (loan_payment / income * 100) if income > 0 and loan_payment else 0.0
+    outstanding_loan = form_data.get('outstanding_loan', 0.0)
+    loan_to_savings = (outstanding_loan / monthly_savings) if monthly_savings > 0 and outstanding_loan else 0.0
+    variance_pct = (monthly_variance / monthly_expenditure * 100) if monthly_expenditure > 0 else 0.0
 
     return {
         "monthly_savings": monthly_savings,
@@ -89,17 +103,47 @@ def financial_health():
     if request.method == 'POST':
         region_code = DEFAULTS["region_code"]
 
+        try:
+            monthly_income = float(request.form.get('monthly_income') or 0)
+        except (ValueError, TypeError):
+            monthly_income = 0.0
+
+        try:
+            savings_percentage = float(request.form.get('savings_percentage') or 0)
+        except (ValueError, TypeError):
+            savings_percentage = 0.0
+
+        try:
+            expected_return = float(request.form.get('expected_return') or 0)
+        except (ValueError, TypeError):
+            expected_return = 0.0
+
+        try:
+            monthly_variance = float(request.form.get('monthly_variance') or 0)
+        except (ValueError, TypeError):
+            monthly_variance = 0.0
+
+        try:
+            monthly_loan_payment = float(request.form.get('monthly_loan_payment') or 0)
+        except (ValueError, TypeError):
+            monthly_loan_payment = 0.0
+
+        try:
+            outstanding_loan = float(request.form.get('outstanding_loan') or 0)
+        except (ValueError, TypeError):
+            outstanding_loan = 0.0
+
         form_data = {
-            'monthly_income': float(request.form['monthly_income']),
-            'savings_percentage': float(request.form['savings_percentage']),
-            'emergency_fund': request.form['emergency_fund'],
-            'funds_invested': request.form['funds_invested'],
+            'monthly_income': monthly_income,
+            'savings_percentage': savings_percentage,
+            'emergency_fund': request.form.get('emergency_fund', 'no'),
+            'funds_invested': request.form.get('funds_invested', 'no'),
             'investment_type': request.form.get('investment_type', 'None'),
-            'expected_return': float(request.form['expected_return']),
-            'monthly_variance': float(request.form['monthly_variance']),
-            'has_loans': request.form['has_loans'],
-            'monthly_loan_payment': float(request.form.get('monthly_loan_payment', 0) or 0),
-            'outstanding_loan': float(request.form.get('outstanding_loan', 0) or 0),
+            'expected_return': expected_return,
+            'monthly_variance': monthly_variance,
+            'has_loans': request.form.get('has_loans', 'no'),
+            'monthly_loan_payment': monthly_loan_payment,
+            'outstanding_loan': outstanding_loan,
             'region_code': region_code,
         }
 
@@ -136,10 +180,16 @@ def history():
     # Standardize date
     for a in assessments:
         if isinstance(a['date'], str):
-            a['date'] = datetime.strptime(a['date'], '%Y-%m-%d %H:%M:%S')
+            try:
+                a['date'] = datetime.strptime(a['date'], '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                try:
+                    a['date'] = datetime.fromisoformat(a['date'].replace(' ', 'T'))
+                except ValueError:
+                    a['date'] = datetime.now()
         country_data = db.get_country_data(a.get('region_code', 'IN'))
         a['region_name'] = country_data['name'] if country_data else 'India'
-        a.setdefault('currency', {'symbol': '₹', 'code': 'INR', 'exchange_rate': 1})
+        a.setdefault('currency', {'symbol': '₹', 'code': 'INR', 'exchange_rate': 83.2})
 
     assessments = sorted(assessments, key=lambda x: x['date'], reverse=True)
 
@@ -169,8 +219,9 @@ def view_assessment(assessment_id):
     if not assessment:
         return redirect(url_for('history'))
 
-    country_data = db.get_country_data(assessment["region_code"])
+    country_data = db.get_country_data(assessment.get("region_code", "IN"))
     assessment['currency'] = country_data["currency"]
+    assessment['economic_data'] = country_data.get('economic_data', {})
 
     return render_template('result.html', analysis=assessment, country_data=country_data)
 
@@ -186,14 +237,36 @@ def export_report(assessment_id):
 
     return redirect(url_for('view_assessment', assessment_id=assessment_id))
 
+@app.route('/export/history')
+def export_history():
+    username = session.get('username')
+    if not username:
+        return redirect(url_for('financial_health'))
+
+    user_id = db.get_or_create_user(username)
+    assessments = db.get_user_assessments(user_id)
+    if not assessments:
+        return redirect(url_for('history'))
+
+    df = pd.DataFrame(assessments)
+    filename = os.path.join(db.DATA_DIR, f"history_{user_id}.csv")
+    df.to_csv(filename, index=False)
+
+    return send_file(
+        filename,
+        as_attachment=True,
+        download_name=f"financial_history_{datetime.now().strftime('%Y%m%d')}.csv"
+    )
+
 # Generate CSV report
 def generate_csv(assessment_id):
     assessment = db.get_assessment_details(assessment_id)
     if not assessment:
         return None
 
-    income = assessment['monthly_income']
-    monthly_savings = income * (assessment['savings_percentage'] / 100)
+    income = assessment.get('monthly_income', 0.0)
+    savings_pct = assessment.get('savings_percentage', 0.0)
+    monthly_savings = income * (savings_pct / 100)
     monthly_expenditure = income - monthly_savings
 
     data = {
@@ -204,24 +277,28 @@ def generate_csv(assessment_id):
             'Monthly Loan Payment', 'Outstanding Loan', 'Financial Health Score'
         ],
         'Value': [
-            assessment['date'],
+            assessment.get('date', ''),
             f"₹{income}",
-            f"{assessment['savings_percentage']}%",
+            f"{savings_pct}%",
             f"₹{monthly_savings}",
             f"₹{monthly_expenditure}",
-            assessment['emergency_fund'],
-            assessment['funds_invested'],
-            assessment['investment_type'],
-            f"{assessment['expected_return']}%",
-            assessment['has_loans'],
+            assessment.get('emergency_fund', ''),
+            assessment.get('funds_invested', ''),
+            assessment.get('investment_type', ''),
+            f"{assessment.get('expected_return', 0)}%",
+            assessment.get('has_loans', ''),
             f"₹{assessment.get('monthly_loan_payment', 0)}",
             f"₹{assessment.get('outstanding_loan', 0)}",
-            f"{assessment['score']}/10"
+            f"{assessment.get('score', 0)}/10"
         ]
     }
 
     df = pd.DataFrame(data)
-    filename = f"financial_report_{assessment_id}.csv"
+    filename = os.path.join(db.DATA_DIR, f"financial_report_{assessment_id}.csv")
     df.to_csv(filename, index=False)
 
     return filename
+
+if __name__ == '__main__':
+    db.init()
+    app.run(host="0.0.0.0", port=5000, debug=True)

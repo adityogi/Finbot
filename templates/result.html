@@ -251,6 +251,12 @@
                 <canvas id="incomeAllocationChart"></canvas>
             </div>
         </div>
+        <div class="card">
+            <h2>Financial Health Radar</h2>
+            <div class="chart-container">
+                <canvas id="financialHealthChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <div class="tab-content" id="recommendations-tab">
@@ -383,66 +389,71 @@
         });
 
         // Charts
-        const incomeAllocationChart = new Chart(
-            document.getElementById('incomeAllocationChart'),
-            {
-                type: 'pie',
-                data: {
-                    labels: ['Loan', 'Savings', 'Variance', 'Expenses'],
-                    datasets: [{
-                        data: [{{ analysis.monthly_loan_payment }},
-                        {{ analysis.monthly_savings - analysis.monthly_variance }},
-                        {{ analysis.monthly_variance}},
-                        {{ analysis.monthly_expenditure }}],
-                        backgroundColor: ['darkgrey', 'green', 'lightblue', 'coral'],
-                        borderColor: [
-                            'blue',  // Darker border for the shaded slice
-                            'transparent',
-                            'white',  // Darker border for the shaded slice
-                            'transparent'
-                        ],
-                        borderWidth: [
-                            1,
-                            0,
-                            2,  // Thicker border on the first slice (Loan)
-                            0
-                        ],
-                        // Optional: To "pull out" the shaded slice for emphasis
-                        offset: [0, 0, 2, 0], // Moves 'Loan' slice out by 10px
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                },
-            },
-        );
-
-        const financialHealthChart = new Chart(
-            document.getElementById('financialHealthChart'),
-            {
-                type: 'radar',
-                data: {
-                    labels: ['Emergency Fund', 'Investments', 'Debt Management', 'Savings Rate', 'Expense Control'],
-                    datasets: [{
-                        label: 'Your Score',
-                        data: [
-                            {{ 10 if analysis.emergency_fund == "yes" else 5 }},
-                            {{ 10 if analysis.funds_invested == "yes" else 5 }},
-                            {{ 10 if analysis.has_loans == "no" else (7 if analysis.loan_to_income_ratio < 30 else 4) }},
-                            {{ 10 if analysis.savings_percentage >= 20 else (7 if analysis.savings_percentage >= 10 else 4) }},
-                            {{ 10 if analysis.variance_percentage < 10 else (7 if analysis.variance_percentage < 20 else 4) }}
-                        ],
-                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                        borderColor: '#4CAF50'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
+        const incEl = document.getElementById('incomeAllocationChart');
+        if (incEl) {
+            new Chart(
+                incEl,
+                {
+                    type: 'pie',
+                    data: {
+                        labels: ['Loan', 'Savings', 'Variance', 'Expenses'],
+                        datasets: [{
+                            data: [{{ analysis.monthly_loan_payment or 0 }},
+                            {{ (analysis.monthly_savings or 0) - (analysis.monthly_variance or 0) }},
+                            {{ analysis.monthly_variance or 0 }},
+                            {{ analysis.monthly_expenditure or 0 }}],
+                            backgroundColor: ['darkgrey', 'green', 'lightblue', 'coral'],
+                            borderColor: [
+                                'blue',
+                                'transparent',
+                                'white',
+                                'transparent'
+                            ],
+                            borderWidth: [
+                                1,
+                                0,
+                                2,
+                                0
+                            ],
+                            offset: [0, 0, 2, 0],
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    },
                 }
-            }
-        );
+            );
+        }
+
+        const fhcEl = document.getElementById('financialHealthChart');
+        if (fhcEl) {
+            new Chart(
+                fhcEl,
+                {
+                    type: 'radar',
+                    data: {
+                        labels: ['Emergency Fund', 'Investments', 'Debt Management', 'Savings Rate', 'Expense Control'],
+                        datasets: [{
+                            label: 'Your Score',
+                            data: [
+                                {{ 10 if analysis.emergency_fund == "yes" else 5 }},
+                                {{ 10 if analysis.funds_invested == "yes" else 5 }},
+                                {{ 10 if analysis.has_loans == "no" else (7 if analysis.loan_to_income_ratio < 30 else 4) }},
+                                {{ 10 if analysis.savings_percentage >= 20 else (7 if analysis.savings_percentage >= 10 else 4) }},
+                                {{ 10 if analysis.variance_percentage < 10 else (7 if analysis.variance_percentage < 20 else 4) }}
+                            ],
+                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                            borderColor: '#4CAF50'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                }
+            );
+        }
     </script>
 </body>
 </html>
