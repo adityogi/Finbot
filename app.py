@@ -135,69 +135,73 @@ def compute_financial_metrics(form_data):
 @app.route('/', methods=['GET', 'POST'])
 def financial_health():
     if request.method == 'POST':
-        region_code = DEFAULTS["region_code"]
-
         try:
-            monthly_income = float(request.form.get('monthly_income') or 0)
-        except (ValueError, TypeError):
-            monthly_income = 0.0
+            region_code = DEFAULTS["region_code"]
 
-        try:
-            savings_percentage = float(request.form.get('savings_percentage') or 0)
-        except (ValueError, TypeError):
-            savings_percentage = 0.0
+            try:
+                monthly_income = float(request.form.get('monthly_income') or 0)
+            except (ValueError, TypeError):
+                monthly_income = 0.0
 
-        try:
-            expected_return = float(request.form.get('expected_return') or 0)
-        except (ValueError, TypeError):
-            expected_return = 0.0
+            try:
+                savings_percentage = float(request.form.get('savings_percentage') or 0)
+            except (ValueError, TypeError):
+                savings_percentage = 0.0
 
-        try:
-            monthly_variance = float(request.form.get('monthly_variance') or 0)
-        except (ValueError, TypeError):
-            monthly_variance = 0.0
+            try:
+                expected_return = float(request.form.get('expected_return') or 0)
+            except (ValueError, TypeError):
+                expected_return = 0.0
 
-        try:
-            monthly_loan_payment = float(request.form.get('monthly_loan_payment') or 0)
-        except (ValueError, TypeError):
-            monthly_loan_payment = 0.0
+            try:
+                monthly_variance = float(request.form.get('monthly_variance') or 0)
+            except (ValueError, TypeError):
+                monthly_variance = 0.0
 
-        try:
-            outstanding_loan = float(request.form.get('outstanding_loan') or 0)
-        except (ValueError, TypeError):
-            outstanding_loan = 0.0
+            try:
+                monthly_loan_payment = float(request.form.get('monthly_loan_payment') or 0)
+            except (ValueError, TypeError):
+                monthly_loan_payment = 0.0
 
-        form_data = {
-            'monthly_income': monthly_income,
-            'savings_percentage': savings_percentage,
-            'emergency_fund': request.form.get('emergency_fund', 'no'),
-            'funds_invested': request.form.get('funds_invested', 'no'),
-            'investment_type': request.form.get('investment_type', 'None'),
-            'expected_return': expected_return,
-            'monthly_variance': monthly_variance,
-            'has_loans': request.form.get('has_loans', 'no'),
-            'monthly_loan_payment': monthly_loan_payment,
-            'outstanding_loan': outstanding_loan,
-            'region_code': region_code,
-        }
+            try:
+                outstanding_loan = float(request.form.get('outstanding_loan') or 0)
+            except (ValueError, TypeError):
+                outstanding_loan = 0.0
 
-        country_data = db.get_country_data(region_code)
-        form_data['currency'] = country_data["currency"]
+            form_data = {
+                'monthly_income': monthly_income,
+                'savings_percentage': savings_percentage,
+                'emergency_fund': request.form.get('emergency_fund', 'no'),
+                'funds_invested': request.form.get('funds_invested', 'no'),
+                'investment_type': request.form.get('investment_type', 'None'),
+                'expected_return': expected_return,
+                'monthly_variance': monthly_variance,
+                'has_loans': request.form.get('has_loans', 'no'),
+                'monthly_loan_payment': monthly_loan_payment,
+                'outstanding_loan': outstanding_loan,
+                'region_code': region_code,
+            }
 
-        # Compute metrics
-        metrics = compute_financial_metrics(form_data)
+            country_data = db.get_country_data(region_code)
+            form_data['currency'] = country_data["currency"]
 
-        # Session/user handling
-        username = session.get('username', f"user_{uuid.uuid4().hex[:8]}")
-        session['username'] = username
-        user_id = db.get_or_create_user(username)
+            # Compute metrics
+            metrics = compute_financial_metrics(form_data)
 
-        # Build analysis dictionary
-        analysis = {**form_data, **metrics, "economic_data": country_data.get('economic_data', {})}
-        analysis["score"] = calculate_score(analysis, country_data)
-        analysis["id"] = db.save_assessment(user_id, form_data, analysis["score"])
+            # Session/user handling
+            username = session.get('username', f"user_{uuid.uuid4().hex[:8]}")
+            session['username'] = username
+            user_id = db.get_or_create_user(username)
 
-        return render_template('result.html', analysis=analysis, country_data=country_data)
+            # Build analysis dictionary
+            analysis = {**form_data, **metrics, "economic_data": country_data.get('economic_data', {})}
+            analysis["score"] = calculate_score(analysis, country_data)
+            analysis["id"] = db.save_assessment(user_id, form_data, analysis["score"])
+
+            return render_template('result.html', analysis=analysis, country_data=country_data)
+        except Exception as e:
+            tb = traceback.format_exc()
+            return f"<h1>Caught Exception: {type(e).__name__}</h1><pre>{tb}</pre>", 200
 
     return render_template('form.html')
 
