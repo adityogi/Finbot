@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file
 import os
+import traceback
 import pandas as pd
 import data_csv as db
 import uuid
 from datetime import datetime
+from jinja2 import ChoiceLoader, FileSystemLoader
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -15,12 +17,44 @@ app = Flask(
 )
 app.secret_key = os.environ.get('SECRET_KEY', 'financial_health_secret_key')
 
+# Configure multi-path template loader to support local and Vercel serverless environments
+possible_template_dirs = [
+    os.path.join(BASE_DIR, 'templates'),
+    os.path.join(BASE_DIR, 'api', 'templates'),
+    os.path.join(os.getcwd(), 'templates'),
+    os.path.join(os.getcwd(), 'api', 'templates'),
+    '/var/task/templates',
+    '/var/task/api/templates',
+]
+valid_template_dirs = [d for d in possible_template_dirs if os.path.isdir(d)]
+if valid_template_dirs:
+    app.jinja_loader = ChoiceLoader([FileSystemLoader(d) for d in valid_template_dirs])
+
 # Defaults
 DEFAULTS = {
     "region_code": 'IN',
     "savings_rate": 20,
     "max_loan_to_income": 40,
 }
+
+# ---------- Error Handling ----------
+@app.errorhandler(500)
+@app.errorhandler(Exception)
+def handle_error(error):
+    tb = traceback.format_exc()
+    app.logger.error(f"Application Error: {tb}")
+    return f"""<!DOCTYPE html>
+<html>
+<head><title>Application Error</title></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 30px; background: #fff5f5; color: #333;">
+    <div style="max-width: 800px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 5px solid #e53e3e;">
+        <h2 style="color: #e53e3e; margin-top: 0;">Application Error (500)</h2>
+        <p><strong>Message:</strong> {error}</p>
+        <pre style="background: #2d3748; color: #f7fafc; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 13px;">{tb}</pre>
+        <p><a href="/" style="color: #3182ce;">Return to Home</a></p>
+    </div>
+</body>
+</html>""", 500
 
 
 # ---------- Helper Functions ----------
@@ -301,4 +335,5 @@ def generate_csv(assessment_id):
 
 if __name__ == '__main__':
     db.init()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
